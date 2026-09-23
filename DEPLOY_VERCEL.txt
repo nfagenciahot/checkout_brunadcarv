@@ -17,8 +17,7 @@ BRUNADIAS LP - DEPLOY VERCEL
    OMEGAPAY_PUBLIC_KEY
    OMEGAPAY_SECRET_KEY
    OMEGAPAY_DOCUMENT
-   UPSTASH_REDIS_REST_URL
-   UPSTASH_REDIS_REST_TOKEN
+   REDIS_URL
    TELEGRAM_BOT_TOKEN
 
 4) OMEGAPAY_CALLBACK_URL pode ficar vazio. O site enviará automaticamente:
@@ -31,3 +30,5 @@ BRUNADIAS LP - DEPLOY VERCEL
 7) O webhook da OmegaPay tenta gerar o convite Telegram automaticamente. O convite tem limite de 1 membro e não possui expiração por tempo. Se a geração falhar, o pedido fica como entrega manual, sem perder a venda.
 
 8) O /panel em produção precisa do GITHUB_TOKEN para salvar arquivos/configuração no repositório. Cada alteração no GitHub dispara novo deploy da Vercel.
+
+9) REDIS_URL é usada para persistir pedidos, status do PIX e o token privado do Telegram entre deployments.

@@ -1,0 +1,13 @@
+V26 - Vercel Redis
+
+- Persistência migrada para REDIS_URL fornecida pela Vercel.
+- Token privado do Telegram salvo no Redis pelo /panel.
+- Pedidos e status PIX persistidos no mesmo Redis.
+- Removido fallback local de segredos/pedidos.
+- /panel continua lendo e salvando config.json exclusivamente pelo GitHub.
+- Configuração atual de planos/bio mantida conforme config.json enviado.
+
+Dependência adicionada:
+redis
+
+Após copiar a versão, rode npm.cmd install antes do commit para atualizar package-lock.json.
