@@ -7,8 +7,18 @@ import { readSiteConfig } from '../../../../lib/siteConfig';
 
 const SITE_URL = process.env.SITE_URL?.trim().replace(/\/$/, '') || '';
 const OMEGAPAY_CALLBACK_URL = process.env.OMEGAPAY_CALLBACK_URL?.trim() || (SITE_URL ? `${SITE_URL}/api/webhooks/omegapay` : '');
-const OMEGAPAY_DOCUMENT = process.env.OMEGAPAY_DOCUMENT?.trim() || '';
 const DEFAULT_PIX_TIMEOUT_MINUTES = 20;
+
+function generateCpf() {
+  const d = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+  for (let v = 0; v < 2; v++) {
+    const len = 9 + v;
+    const sum = d.slice(0, len).reduce((acc, n, i) => acc + n * (len + 1 - i), 0);
+    const rem = sum % 11;
+    d.push(rem < 2 ? 0 : 11 - rem);
+  }
+  return d.join('');
+}
 
 function technicalEmail(name, orderId) {
   const base = String(name || 'cliente')
@@ -34,9 +44,7 @@ export async function POST(request) {
     if (!phone.ok) return NextResponse.json({ error:phone.message }, { status:400 });
 
     const config = await readSiteConfig();
-    if (!OMEGAPAY_DOCUMENT) {
-      return NextResponse.json({ error:'Documento da OmegaPay não configurado.' }, { status:500 });
-    }
+    const document = generateCpf();
     const timeoutMinutes = Math.max(1, Math.min(120, Number(config.checkout?.pixTimeoutMinutes || DEFAULT_PIX_TIMEOUT_MINUTES)));
     const plan = (config.subscriptions || []).find(item => item.id === body?.planId && item.enabled !== false);
     if (!plan) return NextResponse.json({ error:'Plano inválido ou indisponível.' }, { status:400 });
@@ -62,7 +70,7 @@ export async function POST(request) {
       planPrice,
       includeBump,
       bumpPrice,
-      customer: { name, phone: phone.formatted, phoneDigits: phone.digits, document: OMEGAPAY_DOCUMENT, email: technicalEmail(name, orderId) },
+      customer: { name, phone: phone.formatted, phoneDigits: phone.digits, document, email: technicalEmail(name, orderId) },
       delivery: { chatId: String(plan.delivery?.chatId || ''), chatTitle: plan.delivery?.chatTitle || '', chatType: plan.delivery?.chatType || '' },
       resumeTokenHash: hashToken(resumeToken),
       createdAt: now,
@@ -79,7 +87,7 @@ export async function POST(request) {
         name,
         email: order.customer.email,
         phone: phone.formatted,
-        document: OMEGAPAY_DOCUMENT,
+        document,
       },
       products,
       ...(OMEGAPAY_CALLBACK_URL ? { callbackUrl: OMEGAPAY_CALLBACK_URL } : {}),
