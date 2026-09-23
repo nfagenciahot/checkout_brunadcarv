@@ -44,11 +44,11 @@
       "delivery": {
         "enabled": true,
         "type": "telegram",
-        "chatId": "",
-        "chatTitle": "",
-        "chatType": "",
-        "verified": false,
-        "canInviteUsers": false
+        "chatId": "-1003939496281",
+        "chatTitle": "VIP Bruna Dias",
+        "chatType": "channel",
+        "verified": true,
+        "canInviteUsers": true
       }
     },
     {
@@ -59,11 +59,11 @@
       "delivery": {
         "enabled": true,
         "type": "telegram",
-        "chatId": "",
-        "chatTitle": "",
-        "chatType": "",
-        "verified": false,
-        "canInviteUsers": false
+        "chatId": "-1003939496281",
+        "chatTitle": "VIP Bruna Dias",
+        "chatType": "channel",
+        "verified": true,
+        "canInviteUsers": true
       }
     },
     {
@@ -74,11 +74,11 @@
       "delivery": {
         "enabled": true,
         "type": "telegram",
-        "chatId": "",
-        "chatTitle": "",
-        "chatType": "",
-        "verified": false,
-        "canInviteUsers": false
+        "chatId": "-1003939496281",
+        "chatTitle": "VIP Bruna Dias",
+        "chatType": "channel",
+        "verified": true,
+        "canInviteUsers": true
       }
     },
     {
@@ -89,11 +89,11 @@
       "delivery": {
         "enabled": true,
         "type": "telegram",
-        "chatId": "",
-        "chatTitle": "",
-        "chatType": "",
-        "verified": false,
-        "canInviteUsers": false
+        "chatId": "-1003939496281",
+        "chatTitle": "VIP Bruna Dias",
+        "chatType": "channel",
+        "verified": true,
+        "canInviteUsers": true
       }
     }
   ],
