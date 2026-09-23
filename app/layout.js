@@ -13,6 +13,13 @@ export const metadata = {
   description: 'Assinatura privada da Bruna Dias',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#f9f6f2',
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">

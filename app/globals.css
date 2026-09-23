@@ -111,3 +111,83 @@ button,.panelUploadButton,.subscribeButton,.modalGradientButton,.panelPrimary,.p
 .panelMigrationBox strong{font-size:14px}
 .panelMigrationBox p{margin:0;color:#756b63;font-size:13px;line-height:1.45}
 @media(max-width:640px){.coverViewport{height:420px!important}.smartVideoPlay{width:58px;height:58px}.bumpMedia .smartVideoShell,.bumpMedia .bumpVideoObject{height:155px}.bumpMediaGrid.single .bumpMedia,.bumpMediaGrid.single .smartVideoShell,.bumpMediaGrid.single .bumpVideoObject{height:190px}}
+
+/* ==============================
+   MOBILE OVERHAUL
+   ============================== */
+
+/* Remove 300ms tap delay em todos os elementos interativos */
+button,a,input,select,textarea,[role="button"],.subscribeButton,.modalGradientButton,.smartVideoShell{touch-action:manipulation}
+
+/* Scroll suave no iOS dentro de modais */
+.modalCard{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+
+/* Bottom sheet — modal sobe de baixo no celular */
+@keyframes sheetUp{from{transform:translateY(52px);opacity:.7}to{transform:translateY(0);opacity:1}}
+
+@media(max-width:640px){
+  /* Backdrop alinha na base */
+  .modalBackdrop{align-items:flex-end!important;padding:0!important}
+
+  /* Modal como bottom sheet */
+  .modalCard{
+    width:100%!important;max-width:100%!important;
+    border-radius:22px 22px 0 0!important;
+    padding:10px 18px 36px!important;
+    padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))!important;
+    max-height:92dvh!important;max-height:92vh!important;
+    overflow-y:auto!important;
+    animation:sheetUp .22s cubic-bezier(.22,.61,.36,1)
+  }
+
+  /* Handle bar visual */
+  .modalCard::before{
+    content:'';display:block;
+    width:40px;height:4px;
+    background:#ddd6cf;border-radius:2px;
+    margin:0 auto 16px
+  }
+
+  /* Fechar no topo direito — aumenta area de toque */
+  .modalClose{width:40px!important;height:40px!important;top:10px!important;right:14px!important}
+
+  /* Cover menor pra dar espaço ao conteúdo */
+  .coverViewport{height:280px!important}
+
+  /* Hero stats — evitar sobreposição com avatar em telas pequenas */
+  .heroStatsImage{width:175px!important}
+  .heroStatsImageButton{right:14px!important;top:6px!important}
+  .nameRow{margin-top:68px!important}
+
+  /* CTAs maiores — mínimo 52px de altura para polegar */
+  .subscribeButton{min-height:56px!important;padding:16px 20px!important;font-size:16px!important}
+  .subscribeButton span,.subscribeButton strong{font-size:16px!important}
+  .modalGradientButton{min-height:52px!important;padding:16px 20px!important;font-size:16px!important}
+  .checkoutPayButton{min-height:54px!important;font-size:16px!important}
+  .cancelPixButton{min-height:48px!important;padding:12px!important}
+
+  /* PIX — QR mais proeminente */
+  .pixQrWrap{width:min(240px,70vw)!important;padding:14px!important;margin:16px auto!important}
+  .pixCodeBox textarea{font-size:11.5px!important;min-height:84px!important}
+  .pixCountdown{font-size:14px!important;margin-top:14px!important}
+  .paymentWaiting{margin-top:18px!important;font-size:14px!important}
+
+  /* Delivery — botão Telegram bem grande */
+  .telegramAccessButton{min-height:56px!important;font-size:17px!important;font-weight:700!important}
+  .deliveryState{min-height:260px!important;padding:10px 0!important}
+
+  /* Cancelar PIX overlay — ocupa tudo no bottom sheet */
+  .cancelPixActions{grid-template-columns:1fr!important;gap:8px!important}
+  .cancelPixCard{padding:18px!important}
+  .cancelPixCard h3{font-size:18px!important}
+
+  /* Bump media grid — itens maiores empilhados */
+  .bumpBenefits{padding:12px!important;margin:14px 0 16px!important}
+  .bumpBenefits p{font-size:14px!important}
+
+  /* Abas — altura confortável */
+  .tab{height:52px!important;font-size:15px!important}
+
+  /* Feedback visual de toque */
+  .subscribeButton:active,.modalGradientButton:active,.checkoutPayButton:active{filter:brightness(.93)!important;transform:scale(.99)!important}
+}
