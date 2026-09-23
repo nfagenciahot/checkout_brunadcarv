@@ -105,7 +105,7 @@
     {
       "id": 1,
       "enabled": true,
-      "media": "/postagem1.mp4",
+      "media": "/api/media/panel-media/postagem1/1790187950169-pronto-fUAyDke1gd1OJd1Kx6TPBFr0eRlD4u.mp4",
       "likedBy": "luccho.ecom",
       "likedByAvatar": "curtiu1",
       "description": "Bem-vindo ao meu conteúdo privado 💎🔥"
@@ -113,14 +113,14 @@
     {
       "id": 2,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem2/1790184661700-tela-completa-copia-1-a5rFgeZa5nVbiLxAMGnvGoNqdBkwxb.mp4",
+      "media": "/api/media/panel-media/postagem2/1790187902166-tela-completa-copia-1-CgVG5BYvvXce1wPHdZiK60AQu3GuWa.mp4",
       "likedBy": "andresbarriles",
       "likedByAvatar": "curtiu2",
       "description": "Tem conteúdo novo esperando por você 👀"
     },
     {
       "id": 3,
-      "enabled": true,
+      "enabled": false,
       "media": "/postagem3.mp4",
       "likedBy": "gabrieldamasceno",
       "likedByAvatar": "curtiu3",
@@ -149,12 +149,13 @@
     "skipButton": "🚫 Somente o VIP",
     "media": [
       {
+        "enabled": false,
         "src": "/bump-1.jpg",
         "caption": "1 Foto personalizada"
       },
       {
+        "enabled": true,
         "src": "/bump-2.mp4",
-        "poster": "/bump-poster-2.jpg",
         "caption": "+50 vídeos especiais"
       }
     ]
