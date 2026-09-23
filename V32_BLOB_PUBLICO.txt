@@ -1,0 +1,18 @@
+V32 — Blob público + streaming de vídeo
+
+PROBLEMA:
+Vídeos ficavam em loading infinito. Causa: blobs privados usam URL assinada
+via redirect 307. Vídeos precisam de range requests para buffering — o redirect
+rompia esse fluxo.
+
+CORREÇÕES:
+1. Novos uploads agora são access:'public' (upload/route.js + panel/page.js)
+2. URL salva no config.json agora é a URL direta do blob (não mais /api/media/...)
+3. /api/site-config simplificado: lê config.json dinamicamente, sem signing
+4. /api/media proxy corrigido: faz streaming real com suporte a Range headers
+   (fallback para blobs privados já existentes)
+
+AÇÃO NECESSÁRIA:
+Re-fazer upload de todas as mídias pelo painel (/panel) para gerar novas URLs
+públicas. Enquanto não fizer isso, os vídeos existentes ainda passam pelo proxy
+(mais lento mas funcional).
