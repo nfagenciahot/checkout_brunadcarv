@@ -92,7 +92,7 @@ button,.panelUploadButton,.subscribeButton,.modalGradientButton,.panelPrimary,.p
 .verifiedImg{display:block;fill:none}
 .audioPlayGlyph{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffad32,#ff3c73);color:#fff;box-shadow:0 8px 24px rgba(255,91,92,.18)}
 .audioPlayGlyph .playIcon{width:31px;height:31px;margin-left:4px}
-.smartVideoShell{position:relative;width:100%;overflow:hidden;background:#111;line-height:0}
+.smartVideoShell{position:relative;width:100%;overflow:hidden;background:#111;line-height:0}.smartVideoShell:not(.started){cursor:pointer}
 .smartVideoShell video{transition:opacity .12s ease;background:#111}
 .smartVideoShell:not(.frameReady):not(.started) video{opacity:0}
 .smartVideoShell.frameReady video,.smartVideoShell.started video{opacity:1}

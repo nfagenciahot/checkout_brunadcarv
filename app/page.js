@@ -286,7 +286,7 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
     }
   }
 
-  return <div ref={shellRef} className={`smartVideoShell ${started?'started':''} ${frameReady?'frameReady':''}`}>
+  return <div ref={shellRef} className={`smartVideoShell ${started?'started':''} ${frameReady?'frameReady':''}`} onClick={!started?activate:undefined}>
     <video
       ref={videoRef}
       className={className}
