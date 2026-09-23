@@ -4,16 +4,12 @@
     "username": "bruna.dcarv",
     "topTitle": "Bruna Dias",
     "bio": [
-      "Vem conferir tudinho nos meus assinantes VIP🔥🔞",
+      "Lindo… você entrou aqui porque sabe que merece ver o que os outros só ficam imaginando",
       "",
-      "♡ VIP 15 Dias",
-      "+ 15 Vídeos Exclusivos💎",
+      " 🔥Conteúdos quentes, brincadeiras com minhas amiguinhas e muito mais 💦",
+      " 🔞 Mais de 1.600 assinantes já estão aproveitando tudo… ♡",
       "",
-      "♡ VIP 30 Dias",
-      "+ 25 Vídeos Exclusivos💎",
-      "+ Pack com Amiguinhas",
-      "",
-      "Vem me ver peladinha e gozar comigo, estou toda molhadinha💦🔞"
+      "Enquanto você ainda tá aí só imaginando, tem gente lá dentro do VIP aproveitando cada detalhe ♡"
     ],
     "brandText": "bruna.dcarv",
     "socials": {
@@ -69,6 +65,36 @@
         "verified": false,
         "canInviteUsers": false
       }
+    },
+    {
+      "id": "plano3",
+      "enabled": false,
+      "name": "",
+      "price": 0,
+      "delivery": {
+        "enabled": true,
+        "type": "telegram",
+        "chatId": "",
+        "chatTitle": "",
+        "chatType": "",
+        "verified": false,
+        "canInviteUsers": false
+      }
+    },
+    {
+      "id": "plano4",
+      "enabled": false,
+      "name": "",
+      "price": 0,
+      "delivery": {
+        "enabled": true,
+        "type": "telegram",
+        "chatId": "",
+        "chatTitle": "",
+        "chatType": "",
+        "verified": false,
+        "canInviteUsers": false
+      }
     }
   ],
   "audio": {
@@ -78,27 +104,27 @@
   "posts": [
     {
       "id": 1,
-      "likedBy": "luccho.ecom",
-      "description": "Bem-vindo ao meu conteúdo privado 💎🔥",
-      "likedByAvatar": "curtiu1",
       "enabled": true,
-      "media": "/postagem1.mp4"
+      "media": "/postagem1.mp4",
+      "likedBy": "luccho.ecom",
+      "likedByAvatar": "curtiu1",
+      "description": "Bem-vindo ao meu conteúdo privado 💎🔥"
     },
     {
       "id": 2,
-      "likedBy": "andresbarriles",
-      "description": "Tem conteúdo novo esperando por você 👀",
-      "likedByAvatar": "curtiu2",
       "enabled": true,
-      "media": "/postagem2.mp4"
+      "media": "/postagem2.mp4",
+      "likedBy": "andresbarriles",
+      "likedByAvatar": "curtiu2",
+      "description": "Tem conteúdo novo esperando por você 👀"
     },
     {
       "id": 3,
-      "likedBy": "gabrieldamasceno",
-      "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥",
-      "likedByAvatar": "curtiu3",
       "enabled": true,
-      "media": "/postagem3.mp4"
+      "media": "/postagem3.mp4",
+      "likedBy": "gabrieldamasceno",
+      "likedByAvatar": "curtiu3",
+      "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥"
     }
   ],
   "lockedPost": {
