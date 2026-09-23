@@ -1,0 +1,20 @@
+V29 — VIDEO FRAME + BLOB
+
+1. A capa do perfil não anima mais no scroll.
+2. Vídeos das postagens:
+   - frame automático em ~0,7–1,2s em vez do frame 0;
+   - frame fica parado com botão Play;
+   - vídeo começa do início ao clicar;
+   - preload inteligente por proximidade da viewport;
+   - mídia privada é entregue por URL temporária direta do Blob, permitindo Range requests.
+3. Order bump:
+   - cada mídia pode ser habilitada/desabilitada;
+   - se apenas uma estiver habilitada, ocupa o layout sozinha;
+   - foto/vídeo são detectados automaticamente;
+   - vídeos usam frame automático, sem poster separado.
+4. Painel:
+   - novos uploads para heroStats e postActions;
+   - botão "Migrar tudo para o Blob" move referências locais atuais para o Blob e atualiza config.json.
+5. Limpeza do GitHub:
+   - após a migração e redeploy, rode tools/cleanup-public-media.ps1.
+   - o script só apaga mídias locais se o config de produção não depender mais delas.

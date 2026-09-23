@@ -25,8 +25,8 @@ const DEFAULT_CONFIG = {
   orderBump: {
     price:6.9, eyebrow:'Oferta exclusiva para o seu VIP', title:'Tenho mais uma surpresinha esperando por você 🔥', lead:'Além do VIP você pode ter acesso a mais conteúdos especiais 💦',
     media:[
-      {src:'/bump-photo.jpg', caption:'1 Foto personalizada'},
-      {src:'/order-bump-video.mp4', poster:'/bump-video.jpg', caption:'+50 vídeos especiais'}
+      {enabled:true,src:'/bump-1.jpg',caption:'1 Foto personalizada'},
+      {enabled:true,src:'/bump-2.mp4',caption:'+50 vídeos especiais'}
     ],
     benefits:['♡ 1 Foto com seu nome na minha bunda','♡ 50 Vídeos safados com minhas amigas','♡ Acesso ao meu WhatsApp privado','♡ Grupo privado dos melhores conteúdos'], includeButton:'🔥 Incluir', skipButton:'🚫 Somente o VIP'
   },
@@ -42,7 +42,7 @@ const POST_EXTENSIONS = ['mp4','webm','mov','jpg','jpeg','png','webp'];
 function money(value) { return `R$ ${Number(value || 0).toFixed(2).replace('.', ',')}`; }
 function formatCountdown(totalSeconds){ const s=Math.max(0,Number(totalSeconds||0)); return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
 function cleanHandle(value='') { return String(value).replace(/^@/, ''); }
-function isVideoPath(src='') { return /\.(mp4|webm|mov)$/i.test(src); }
+function isVideoPath(src='') { return /\.(mp4|webm|mov|m4v)$/i.test(String(src||'').split('?')[0]); }
 function normalizePhoneInput(value='') {
   let digits=String(value).replace(/\D/g,'').slice(0,13);
   if((digits.length===12||digits.length===13)&&digits.startsWith('55')) digits=digits.slice(2);
@@ -71,7 +71,7 @@ function formatDuration(value) {
 }
 
 function VerifiedBadge({ small=false }) {
-  return <img src="/verified.png" alt="Verificado" className={small ? 'verifiedImg small' : 'verifiedImg'} />;
+  return <svg viewBox="0 0 24 24" aria-label="Verificado" className={small ? 'verifiedImg small' : 'verifiedImg'}><path d="M12 2.8l2.1 1.8 2.7-.2.9 2.6 2.4 1.4-.7 2.6 1.2 2.4-1.9 2-.3 2.7-2.7.5-1.6 2.2-2.5-1.1-2.5 1.1-1.6-2.2-2.7-.5-.3-2.7-1.9-2L4.6 11l-.7-2.6L6.3 7l.9-2.6 2.7.2L12 2.8z" fill="#3b82f6"/><path d="M8.2 12.1l2.3 2.3 5.2-5.2" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
 function IconBookmark() { return <svg viewBox="0 0 24 24" className="actionIcon"><path d="M7 4.5h10a1 1 0 011 1V20l-6-3.7L6 20V5.5a1 1 0 011-1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/></svg>; }
 function IconInstagram() { return <svg viewBox="0 0 24 24" className="socialIcon"><rect x="4.2" y="4.2" width="15.6" height="15.6" rx="4.2" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></svg>; }
@@ -163,7 +163,7 @@ function WaveAudioPlayer({ src, ariaLabel }) {
   return <div className="welcomeAudio" aria-label={ariaLabel}>
     <audio ref={audioRef} src={src} preload="metadata" onLoadedMetadata={e=>setDuration(e.currentTarget.duration)} onPlay={()=>{setStarted(true);setPlaying(true)}} onPause={()=>setPlaying(false)} onEnded={()=>{setPlaying(false);setProgress(1)}} onTimeUpdate={e=>{ if(!playing) setProgress(e.currentTarget.duration ? e.currentTarget.currentTime/e.currentTarget.duration : 0); }} />
     <button type="button" className="audioPlayButton" onClick={togglePlay} aria-label={playing?'Pausar áudio':'Reproduzir áudio'}>
-      {!playing ? <img src="/audio-play.png" alt="" /> : <span className="audioPause"><i/><i/></span>}
+      {!playing ? <span className="audioPlayGlyph"><IconPlay/></span> : <span className="audioPause"><i/><i/></span>}
     </button>
     <div className={`waveTrack ${started?'started':'waiting'}`} ref={waveRef} onClick={seek} role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress*100)}>
       <div className="waveBase"><WaveBars bars={bars}/></div>
@@ -172,17 +172,124 @@ function WaveAudioPlayer({ src, ariaLabel }) {
   </div>;
 }
 
-function BumpMediaCard({ item, onOpen }) {
+function previewFrameTime(duration) {
+  if (!Number.isFinite(duration) || duration <= 0.2) return 0;
+  const safeEnd=Math.max(0,duration-0.08);
+  return Math.min(safeEnd,Math.max(0.7,Math.min(1.2,duration*0.08)));
+}
+
+function SmartVideo({ src, className='', onActivate=null, showDuration=false, ariaLabel='Reproduzir vídeo' }) {
+  const videoRef=useRef(null);
+  const shellRef=useRef(null);
+  const primedRef=useRef(false);
   const [duration,setDuration]=useState(null);
+  const [nearViewport,setNearViewport]=useState(false);
+  const [frameReady,setFrameReady]=useState(false);
+  const [started,setStarted]=useState(false);
+  const [loading,setLoading]=useState(false);
+
+  useEffect(()=>{
+    primedRef.current=false;
+    setDuration(null);
+    setFrameReady(false);
+    setStarted(false);
+    setLoading(false);
+  },[src]);
+
+  useEffect(()=>{
+    const node=shellRef.current;
+    if(!node || typeof IntersectionObserver==='undefined'){setNearViewport(true);return;}
+    const observer=new IntersectionObserver(entries=>{
+      if(entries.some(entry=>entry.isIntersecting)){
+        setNearViewport(true);
+        observer.disconnect();
+      }
+    },{rootMargin:'900px 0px'});
+    observer.observe(node);
+    return()=>observer.disconnect();
+  },[src]);
+
+  useEffect(()=>{
+    const video=videoRef.current;
+    if(video && nearViewport) video.preload='auto';
+  },[nearViewport]);
+
+  function markFrameReady(video){
+    if(typeof video.requestVideoFrameCallback==='function'){
+      video.requestVideoFrameCallback(()=>setFrameReady(true));
+    } else {
+      setFrameReady(true);
+    }
+  }
+
+  function onLoadedMetadata(event){
+    const video=event.currentTarget;
+    setDuration(video.duration);
+    if(primedRef.current) return;
+    primedRef.current=true;
+    const target=previewFrameTime(video.duration);
+    if(target>0.02){
+      try{ video.currentTime=target; }catch(_){ markFrameReady(video); }
+    } else {
+      markFrameReady(video);
+    }
+  }
+
+  async function activate(event){
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    if(onActivate){ onActivate(); return; }
+    const video=videoRef.current;
+    if(!video) return;
+    setStarted(true);
+    setLoading(true);
+    try{
+      if(video.currentTime>0.05) video.currentTime=0;
+      await video.play();
+    }catch(_){
+      // Os controles permanecem disponíveis se o navegador bloquear o play automático pós-clique.
+    }finally{
+      if(video.readyState>=3) setLoading(false);
+    }
+  }
+
+  return <div ref={shellRef} className={`smartVideoShell ${started?'started':''} ${frameReady?'frameReady':''}`}>
+    <video
+      ref={videoRef}
+      className={className}
+      src={src}
+      muted={!!onActivate}
+      playsInline
+      preload={nearViewport?'auto':'metadata'}
+      controls={started && !onActivate}
+      onLoadedMetadata={onLoadedMetadata}
+      onSeeked={e=>{if(!started)markFrameReady(e.currentTarget)}}
+      onCanPlay={()=>{if(started)setLoading(false)}}
+      onPlaying={()=>setLoading(false)}
+    />
+    {!frameReady && !started && <span className="videoFrameLoading" aria-hidden="true"/>}
+    {!started && frameReady && <button className="smartVideoPlay" type="button" onClick={activate} aria-label={ariaLabel}><IconPlay/></button>}
+    {loading && <span className="videoPlayLoading" aria-hidden="true"/>}
+    {showDuration && <span className="videoDuration">{formatDuration(duration)}</span>}
+  </div>;
+}
+
+function BumpMediaCard({ item, onOpen }) {
   const src=item?.src || '';
   const isVideo=isVideoPath(src);
-  return <button className={`bumpMedia ${isVideo?'videoMedia':'photoMedia'}`} type="button" onClick={()=>onOpen({type:isVideo?'video':'image',src})}>
-    {isVideo ? <video src={src} poster={item?.poster||''} muted preload="metadata" onLoadedMetadata={e=>setDuration(e.currentTarget.duration)}/> : <img src={src} alt={item?.caption||'Prévia especial'}/>}
-    {isVideo && <><span className="videoPlay"><IconPlay/></span><span className="videoDuration">{formatDuration(duration)}</span></>}
-    <span className="mediaOpenHint">{isVideo?'Assistir':'Abrir'}</span>
+  if(isVideo){
+    return <div className="bumpMedia videoMedia">
+      <SmartVideo src={src} className="bumpVideoObject" showDuration onActivate={()=>onOpen({type:'video',src})} ariaLabel="Assistir prévia"/>
+      <span className="mediaCaption">{item?.caption||''}</span>
+    </div>;
+  }
+  return <button className="bumpMedia photoMedia" type="button" onClick={()=>onOpen({type:'image',src})}>
+    <img src={src} alt={item?.caption||'Prévia especial'}/>
+    <span className="mediaOpenHint">Abrir</span>
     <span className="mediaCaption">{item?.caption||''}</span>
   </button>;
 }
+
 
 function PostActions({config}) {
   return <div className="postFooter">
@@ -207,7 +314,6 @@ function PostMeta({ config, likedBy, description, likedByAvatar }) {
 
 export default function HomePage(){
   const [config,setConfig]=useState(DEFAULT_CONFIG);
-  const [progress,setProgress]=useState(0);
   const [modalStep,setModalStep]=useState(null);
   const [selectedPlan,setSelectedPlan]=useState(null);
   const [includeBump,setIncludeBump]=useState(false);
@@ -229,7 +335,6 @@ export default function HomePage(){
   const lastAcceptedClickRef=useRef(0);
 
   useEffect(()=>{fetch('/config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(data)setConfig({...DEFAULT_CONFIG,...data,profile:{...DEFAULT_CONFIG.profile,...data.profile,socials:{...DEFAULT_CONFIG.profile.socials,...(data.profile?.socials||{})}},counts:{...DEFAULT_CONFIG.counts,...data.counts},labels:{...DEFAULT_CONFIG.labels,...data.labels},audio:{...DEFAULT_CONFIG.audio,...data.audio},lockedPost:{...DEFAULT_CONFIG.lockedPost,...data.lockedPost},orderBump:{...DEFAULT_CONFIG.orderBump,...data.orderBump},checkout:{...DEFAULT_CONFIG.checkout,...data.checkout},interaction:{...DEFAULT_CONFIG.interaction,...data.interaction},media:{...DEFAULT_CONFIG.media,...(data.media||{})},likedByAvatars:{...DEFAULT_CONFIG.likedByAvatars,...(data.likedByAvatars||{})}})}).catch(()=>{});},[]);
-  useEffect(()=>{const onScroll=()=>setProgress(Math.min(window.scrollY/240,1));onScroll();window.addEventListener('scroll',onScroll,{passive:true});return()=>window.removeEventListener('scroll',onScroll)},[]);
   useEffect(()=>{document.body.style.overflow=(modalStep||previewMedia)?'hidden':'';return()=>{document.body.style.overflow=''}},[modalStep,previewMedia]);
   useEffect(()=>{
     const handleClick=(event)=>{
@@ -330,8 +435,8 @@ export default function HomePage(){
   },[config.posts]);
 
   const subscriptions=(config.subscriptions||[]).filter(s=>s.enabled!==false).slice(0,4);
-  const coverHeight=420-195*progress;
   const bumpPrice=Number(config.orderBump?.price||0);
+  const bumpMedia=(config.orderBump?.media||[]).filter(item=>item?.enabled!==false && item?.src).slice(0,2);
   const total=useMemo(()=>Number(selectedPlan?.price||0)+(includeBump?bumpPrice:0),[selectedPlan,includeBump,bumpPrice]);
   const filters=config.labels.mediaFilters || ['Todos','Fotos','Vídeos','Pagos'];
 
@@ -402,7 +507,7 @@ export default function HomePage(){
       <header className="topBar brandBar"><img src={config.media?.brandLogo || "/brunadcarv.png"} alt="bruna.dcarv" className="brandLogo" /></header>
 
       <section className="profileCard">
-        <div className="coverViewport" style={{height:`${coverHeight}px`}}><img src={config.media?.cover || "/cover.jpg"} alt="Capa" className="coverImage"/></div>
+        <div className="coverViewport"><img src={config.media?.cover || "/cover.jpg"} alt="Capa" className="coverImage"/></div>
         <div className="profileContent">
           <img src={config.media?.profile || "/profile.jpg"} alt={config.profile.name} className="avatar avatarFixed"/>
           <button type="button" className="heroStatsImageButton" aria-label="Informações do perfil"><img src={config.media?.heroStats || "/hero-stats.png"} alt="Estatísticas do perfil" className="heroStatsImage"/></button>
@@ -431,13 +536,13 @@ export default function HomePage(){
       </section>
 
       {activeMainTab==='posts' ? <div className="postsList">
-        {posts.map(post=><section className="postCard" key={post.id}><PostHeader config={config}/><div className="uploadedPostMedia">{post.type==='video'?<video className="postMediaObject" src={post.src} controls playsInline preload="metadata"/>:<img className="postMediaObject" src={post.src} alt={`Postagem ${post.id}`}/>}</div><PostActions config={config}/><PostMeta config={config} likedBy={post.likedBy} likedByAvatar={post.likedByAvatar} description={post.description}/></section>)}
+        {posts.map(post=><section className="postCard" key={post.id}><PostHeader config={config}/><div className="uploadedPostMedia">{post.type==='video'?<SmartVideo className="postMediaObject" src={post.src} ariaLabel={`Reproduzir postagem ${post.id}`}/>:<img className="postMediaObject" src={post.src} alt={`Postagem ${post.id}`}/>}</div><PostActions config={config}/><PostMeta config={config} likedBy={post.likedBy} likedByAvatar={post.likedByAvatar} description={post.description}/></section>)}
         {config.lockedPost.enabled!==false && <section className="postCard fixedVipPost"><PostHeader config={config}/>{config.lockedPost.title ? <div className="vipUnlockText">{config.lockedPost.title}</div> : null}<button type="button" className="vipPostButton" onClick={scrollToTop} aria-label="Ir para assinaturas"><img src={config.media?.vipPost || "/vip-post.png"} alt="Conteúdo VIP bloqueado" className="vipPostImage"/></button><PostActions config={config}/><PostMeta config={config} likedBy={config.lockedPost.likedBy} likedByAvatar={config.lockedPost.likedByAvatar} description={config.lockedPost.description}/></section>}
       </div> : <section className="mediaCard"><div className="mediaFilters">{filters.map(filter=><button key={filter} type="button" className={`mediaFilter ${mediaFilter===filter?'active':''}`} onClick={()=>setMediaFilter(filter)}>{filter}</button>)}</div><div className="lockedGrid">{Array.from({length:9}).map((_,i)=><button type="button" className="lockedGridItem" key={i} onClick={scrollToTop} aria-label="Ir para assinaturas"><img src={config.media?.vipGrid || "/vip-grid.png"} alt="Mídia VIP bloqueada"/></button>)}</div></section>}
     </div>
 
     {modalStep && <div className="modalBackdrop" onMouseDown={e=>{if(!checkoutLocked&&e.target===e.currentTarget)setModalStep(null)}}><div className={`modalCard ${modalStep==='bump'?'bumpModal':'checkoutModal'} ${checkoutLocked?'lockedCheckoutModal':''}`}>{!checkoutLocked&&<button className="modalClose" type="button" onClick={()=>setModalStep(null)} aria-label="Fechar"><IconClose/></button>}
-      {modalStep==='bump' && <><div className="modalEyebrow">{config.orderBump.eyebrow}</div><h2>{config.orderBump.title}</h2><p className="modalLead">{config.orderBump.lead}</p><div className="bumpMediaGrid">{(config.orderBump.media||[]).slice(0,2).map((item,i)=><BumpMediaCard key={`${item.src}-${i}`} item={item} onOpen={setPreviewMedia}/>)}</div><div className="bumpBenefits">{(config.orderBump.benefits||[]).map((b,i)=><p key={i}>{b}</p>)}</div><div className="bumpButtons"><button className="modalGradientButton" type="button" onClick={()=>continueToCheckout(true)}>{config.orderBump.includeButton} {money(bumpPrice)}</button><button className="modalGradientButton" type="button" onClick={()=>continueToCheckout(false)}>{config.orderBump.skipButton}</button></div></>}
+      {modalStep==='bump' && <><div className="modalEyebrow">{config.orderBump.eyebrow}</div><h2>{config.orderBump.title}</h2><p className="modalLead">{config.orderBump.lead}</p><div className={`bumpMediaGrid ${bumpMedia.length===1?'single':''}`}>{bumpMedia.map((item,i)=><BumpMediaCard key={`${item.src}-${i}`} item={item} onOpen={setPreviewMedia}/>)}</div><div className="bumpBenefits">{(config.orderBump.benefits||[]).map((b,i)=><p key={i}>{b}</p>)}</div><div className="bumpButtons"><button className="modalGradientButton" type="button" onClick={()=>continueToCheckout(true)}>{config.orderBump.includeButton} {money(bumpPrice)}</button><button className="modalGradientButton" type="button" onClick={()=>continueToCheckout(false)}>{config.orderBump.skipButton}</button></div></>}
       {modalStep==='checkout' && <><button className="modalBack" type="button" onClick={()=>setModalStep('bump')}><IconBack/> {config.checkout.back}</button><div className="modalEyebrow">{config.checkout.eyebrow}</div><h2>{config.checkout.title}</h2><p className="modalLead">{config.checkout.lead}</p><div className="checkoutFields checkoutFieldsTwo"><input value={checkoutName} onChange={e=>{setCheckoutName(e.target.value);setCheckoutError('')}} placeholder={config.checkout.namePlaceholder} autoComplete="name"/><input value={checkoutPhone} onChange={e=>{setCheckoutPhone(formatPhoneInput(e.target.value));setCheckoutError('')}} placeholder={config.checkout.phonePlaceholder} inputMode="tel" autoComplete="tel"/></div>{checkoutError&&<div className="checkoutError">{checkoutError}</div>}<div className="checkoutSummary"><div><span>{selectedPlan?.name}</span><strong>{money(selectedPlan?.price)}</strong></div>{includeBump&&<div><span>{config.checkout.bumpLabel}</span><strong>{money(bumpPrice)}</strong></div>}<div className="summaryTotal"><span>Total</span><strong>{money(total)}</strong></div></div><button className="modalGradientButton checkoutPayButton" type="button" disabled={creatingPayment} onClick={generatePix}>{creatingPayment?'Gerando PIX...':`${config.checkout.pixButton} — ${money(total)}`}</button></>}
       {modalStep==='pix' && <><div className="modalEyebrow">PIX</div><h2>{config.checkout.pixTitle} — {money(orderState?.amount||total)}</h2><p className="modalLead">{config.checkout.pixLead}</p>{orderState?.pixImage?<div className="pixQrWrap"><img src={orderState.pixImage} alt="QR Code PIX" className="pixQrImage"/></div>:<div className="pixPlaceholder">Gerando QR Code...</div>}<div className="pixCodeBox"><textarea readOnly value={orderState?.pixCode||''}/><button className="modalGradientButton checkoutPayButton" type="button" onClick={copyPix}>{config.checkout.copyPix}</button></div><button className="cancelPixButton" type="button" onClick={()=>setCancelPixConfirm(true)}>Cancelar PIX</button>{pixSecondsLeft!=null&&<div className="pixCountdown">PIX expira em <strong>{formatCountdown(pixSecondsLeft)}</strong></div>}<div className="paymentWaiting"><span className="smallSpinner"/>Aguardando confirmação do pagamento...</div>{cancelPixConfirm&&<div className="cancelPixOverlay"><div className="cancelPixCard"><h3>Cancelar este PIX?</h3><p>Se escolher voltar, você continuará nesta tela com o mesmo QR Code.</p><div className="cancelPixActions"><button type="button" className="modalGradientButton" onClick={()=>setCancelPixConfirm(false)}>Voltar</button><button type="button" className="cancelPixDanger" disabled={cancelingPix} onClick={()=>cancelPix('user')}>{cancelingPix?'Cancelando...':'Cancelar PIX'}</button></div></div></div>}</>}
       {modalStep==='delivery' && <div className="deliveryState"><div className="deliverySpinner"/><div className="modalEyebrow">PAGAMENTO APROVADO</div><h2>{config.checkout.processingTitle||'Pagamento confirmado ✓'}</h2><p className="modalLead">{config.checkout.processingLead||'Você receberá o acesso ao Telegram em alguns instantes.'}</p>{checkoutError&&<><div className="checkoutError">{checkoutError}</div><button className="modalGradientButton checkoutPayButton" type="button" onClick={()=>{deliveryRequestedRef.current=false;setOrderState(s=>({...s,status:'paid'}))}}>Tentar novamente</button></>}</div>}
@@ -445,6 +550,6 @@ export default function HomePage(){
       {modalStep==='delivered' && <div className="deliveryState deliveredState"><div className="deliveryCheck">✓</div><div className="modalEyebrow">ACESSO LIBERADO</div><h2>Seu acesso está pronto</h2><p className="modalLead">Use o botão abaixo para entrar no Telegram. O convite permite apenas uma entrada.</p><a className="modalGradientButton checkoutPayButton telegramAccessButton" href={orderState?.telegramInvite||'#'} target="_blank" rel="noreferrer">{config.checkout.telegramButton||'Entrar no Telegram'}</a></div>}
     </div></div>}
 
-    {previewMedia && <div className="mediaViewerBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setPreviewMedia(null)}}><button className="mediaViewerClose" type="button" onClick={()=>setPreviewMedia(null)} aria-label="Fechar mídia"><IconClose/></button><div className={`mediaViewerContent ${previewMedia.type==='image'?'mediaViewerPhoto':'mediaViewerVideoWrap'}`}>{previewMedia.type==='video'?<video src={previewMedia.src} controls autoPlay playsInline className="mediaViewerVideo"/>:<img src={previewMedia.src} alt="Prévia ampliada" className="mediaViewerImage"/>}</div></div>}
+    {previewMedia && <div className="mediaViewerBackdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setPreviewMedia(null)}}><button className="mediaViewerClose" type="button" onClick={()=>setPreviewMedia(null)} aria-label="Fechar mídia"><IconClose/></button><div className={`mediaViewerContent ${previewMedia.type==='image'?'mediaViewerPhoto':'mediaViewerVideoWrap'}`}>{previewMedia.type==='video'?<video src={previewMedia.src} controls autoPlay playsInline preload="auto" className="mediaViewerVideo"/>:<img src={previewMedia.src} alt="Prévia ampliada" className="mediaViewerImage"/>}</div></div>}
   </main>;
 }

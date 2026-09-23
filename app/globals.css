@@ -85,3 +85,29 @@ button,.panelUploadButton,.subscribeButton,.modalGradientButton,.panelPrimary,.p
 
 /* V23 produção */
 .pixCountdown{text-align:center;margin-top:10px;font-size:13px;color:#746b65}.pixCountdown strong{font-weight:700;color:#ef7c43}.cancelPixActions{grid-template-columns:1fr 1fr}
+
+/* V29 — vídeos sob demanda, frame automático e capa estática */
+.coverViewport{height:420px!important;transition:none!important}
+.coverImage{transition:none!important;transform:none!important}
+.verifiedImg{display:block;fill:none}
+.audioPlayGlyph{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffad32,#ff3c73);color:#fff;box-shadow:0 8px 24px rgba(255,91,92,.18)}
+.audioPlayGlyph .playIcon{width:31px;height:31px;margin-left:4px}
+.smartVideoShell{position:relative;width:100%;overflow:hidden;background:#111;line-height:0}
+.smartVideoShell video{transition:opacity .12s ease;background:#111}
+.smartVideoShell:not(.frameReady):not(.started) video{opacity:0}
+.smartVideoShell.frameReady video,.smartVideoShell.started video{opacity:1}
+.smartVideoPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:62px;height:62px;border:0;border-radius:50%;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;color:#ef865c;z-index:6;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.22)}
+.smartVideoPlay .playIcon{width:31px;height:31px;margin-left:3px}
+.videoFrameLoading,.videoPlayLoading{position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;border:3px solid rgba(255,255,255,.34);border-top-color:#fff;animation:spinCheckout .78s linear infinite;z-index:5;pointer-events:none}
+.videoPlayLoading{z-index:8}
+.uploadedPostMedia .smartVideoShell{width:100%}
+.uploadedPostMedia .postMediaObject{display:block;width:100%;height:auto;max-height:none;object-fit:contain}
+.bumpMediaGrid.single{grid-template-columns:1fr}
+.bumpMediaGrid.single .bumpMedia{width:100%}
+.bumpMedia .smartVideoShell,.bumpMedia .bumpVideoObject{width:100%;height:190px}
+.bumpMedia .bumpVideoObject{object-fit:cover;display:block}
+.bumpMedia.videoMedia{cursor:default}
+.panelMigrationBox{margin-top:18px;padding:15px;border:1px solid #eadfd5;border-radius:14px;background:#faf7f3;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.panelMigrationBox strong{font-size:14px}
+.panelMigrationBox p{margin:0;color:#756b63;font-size:13px;line-height:1.45}
+@media(max-width:640px){.coverViewport{height:420px!important}.smartVideoPlay{width:58px;height:58px}.bumpMedia .smartVideoShell,.bumpMedia .bumpVideoObject{height:155px}.bumpMediaGrid.single .bumpMedia,.bumpMediaGrid.single .smartVideoShell,.bumpMediaGrid.single .bumpVideoObject{height:190px}}

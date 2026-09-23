@@ -79,6 +79,7 @@ export default function PanelPage() {
   const [telegramToken,setTelegramToken]=useState('');
   const [telegramBusy,setTelegramBusy]=useState(false);
   const [telegramVerify,setTelegramVerify]=useState('');
+  const [migratingMedia,setMigratingMedia]=useState(false);
 
   async function checkSession(){
     setChecking(true);
@@ -98,7 +99,7 @@ export default function PanelPage() {
     next.lockedPost ||= {enabled:true,title:'',likedBy:'',likedByAvatar:'curtiu1',description:''};
     if(next.lockedPost.enabled===undefined) next.lockedPost.enabled=true;
     next.audio ||= {src:'/AudioBoasVindas.ogg',ariaLabel:'Áudio'};
-    next.orderBump ||= {}; next.orderBump.benefits ||= []; next.orderBump.includeButton ||= '🔥 Incluir'; next.orderBump.skipButton ||= '🚫 Somente o VIP'; next.orderBump.media=ensureArray(next.orderBump.media,2,i=>({src:i===1?'/bump-1.jpg':'/bump-2.mp4',poster:i===2?'/bump-poster-2.jpg':'',caption:`Mídia ${i}`}));
+    next.orderBump ||= {}; next.orderBump.benefits ||= []; next.orderBump.includeButton ||= '🔥 Incluir'; next.orderBump.skipButton ||= '🚫 Somente o VIP'; next.orderBump.media=ensureArray(next.orderBump.media,2,i=>({enabled:true,src:i===1?'/bump-1.jpg':'/bump-2.mp4',caption:`Mídia ${i}`})).map(item=>({enabled:item.enabled!==false,src:item.src||'',caption:item.caption||''}));
     setConfig(next);setMode(d.mode||'local');
     try{const tr=await fetch('/api/panel/telegram',{cache:'no-store'});const td=await tr.json();setTelegram(td||{configured:false});}catch{}
   }
@@ -123,35 +124,104 @@ export default function PanelPage() {
   function patchPost(index,key,value){setConfig(c=>{const p=[...c.posts];p[index]={...p[index],[key]:value};return {...c,posts:p};});}
   function patchBumpMedia(index,key,value){setConfig(c=>{const media=[...(c.orderBump.media||[])];media[index]={...media[index],[key]:value};return {...c,orderBump:{...c.orderBump,media}};});}
 
+  async function uploadFileToBlob(slot,file,onProgress){
+    const rawName=String(file?.name||'arquivo.bin');
+    const dot=rawName.lastIndexOf('.');
+    const ext=dot>=0?rawName.slice(dot).toLowerCase().replace(/[^.a-z0-9]/g,''):'';
+    const stem=(dot>=0?rawName.slice(0,dot):rawName)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'') || 'arquivo';
+    const pathname=`panel-media/${slot}/${Date.now()}-${stem}${ext}`;
+
+    const blob=await uploadBlob(pathname,file,{
+      access:'private',
+      handleUploadUrl:'/api/panel/upload',
+      clientPayload:JSON.stringify({slot}),
+      multipart:file.size>100*1024*1024,
+      onUploadProgress:({percentage})=>onProgress?.(Math.round(percentage||0)),
+    });
+
+    return {
+      url:`/api/media/${blob.pathname.split('/').map(encodeURIComponent).join('/')}`,
+      blobPathname:blob.pathname,
+    };
+  }
+
   async function upload(slot,file,apply,currentUrl=''){
     setUploading(slot);setStatus('Preparando upload…');
     try{
-      const rawName=String(file?.name||'arquivo.bin');
-      const dot=rawName.lastIndexOf('.');
-      const ext=dot>=0?rawName.slice(dot).toLowerCase().replace(/[^.a-z0-9]/g,''):'';
-      const stem=(dot>=0?rawName.slice(0,dot):rawName)
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'') || 'arquivo';
-      const pathname=`panel-media/${slot}/${Date.now()}-${stem}${ext}`;
-
-      const blob=await uploadBlob(pathname,file,{
-        access:'private',
-        handleUploadUrl:'/api/panel/upload',
-        clientPayload:JSON.stringify({slot}),
-        multipart:file.size>100*1024*1024,
-        onUploadProgress:({percentage})=>setStatus(`Enviando para o Blob… ${Math.round(percentage||0)}%`),
-      });
-
-      const publicUrl=`/api/media/${blob.pathname.split('/').map(encodeURIComponent).join('/')}`;
-      apply(publicUrl);
+      const result=await uploadFileToBlob(slot,file,p=>setStatus(`Enviando para o Blob… ${p}%`));
+      apply(result.url);
       setStatus('Upload concluído no Vercel Blob. Clique em Salvar alterações para publicar esta mídia na LP.');
-      return {ok:true,url:publicUrl,blobPathname:blob.pathname,mode:'blob'};
+      return {ok:true,url:result.url,blobPathname:result.blobPathname,mode:'blob'};
     }catch(err){
       const message=err instanceof Error?err.message:String(err);
       setStatus(`Erro no upload: ${message}`);
       throw err;
     }finally{setUploading('')}
   }
+
+  function isLegacyMedia(src=''){
+    const clean=String(src||'').trim();
+    return /^\/(?!api\/media\/).+\.(jpg|jpeg|png|webp|gif|avif|mp4|webm|mov|m4v|mp3|ogg|wav|m4a|aac|flac)$/i.test(clean.split('?')[0]);
+  }
+
+  async function migrateLegacyMedia(){
+    if(migratingMedia) return;
+    const next=clone(config);
+    next.media ||= {};
+    next.audio ||= {};
+    next.likedByAvatars ||= {};
+    next.posts ||= [];
+    next.orderBump ||= {}; next.orderBump.media ||= [];
+
+    const targets=[
+      ['profile','Foto de perfil',()=>next.media.profile,v=>next.media.profile=v],
+      ['cover','Capa',()=>next.media.cover,v=>next.media.cover=v],
+      ['brand-logo','Logo topo',()=>next.media.brandLogo,v=>next.media.brandLogo=v],
+      ['hero-stats','Estatísticas do perfil',()=>next.media.heroStats,v=>next.media.heroStats=v],
+      ['post-actions','Ações das postagens',()=>next.media.postActions,v=>next.media.postActions=v],
+      ['vip-post','Imagem VIP bloqueada',()=>next.media.vipPost,v=>next.media.vipPost=v],
+      ['vip-grid','Imagem VIP do grid',()=>next.media.vipGrid,v=>next.media.vipGrid=v],
+      ['welcome-audio','Áudio de boas-vindas',()=>next.audio.src,v=>next.audio.src=v],
+      ...['curtiu1','curtiu2','curtiu3'].map(key=>[key,`Avatar ${key}`,()=>next.likedByAvatars[key],v=>next.likedByAvatars[key]=v]),
+      ...next.posts.map((post,i)=>[`postagem${i+1}`,`Postagem ${i+1}`,()=>post.media,v=>post.media=v]),
+      ...next.orderBump.media.map((item,i)=>[`bump-${i+1}`,`Order bump ${i+1}`,()=>item.src,v=>item.src=v]),
+    ];
+    const pending=targets.filter(([, ,get])=>isLegacyMedia(get()));
+    if(!pending.length){setStatus('Todas as mídias configuradas já estão no Blob ou usam URL externa.');return;}
+
+    setMigratingMedia(true);
+    setUploading('migration');
+    try{
+      for(let i=0;i<pending.length;i++){
+        const [slot,label,get,setValue]=pending[i];
+        const src=get();
+        setStatus(`Migrando ${i+1}/${pending.length}: ${label}…`);
+        const response=await fetch(src,{cache:'no-store'});
+        if(!response.ok) throw new Error(`${label}: não consegui ler ${src} (${response.status}).`);
+        const body=await response.blob();
+        const clean=src.split('?')[0];
+        const basename=decodeURIComponent(clean.split('/').pop()||`${slot}.bin`);
+        const file=new File([body],basename,{type:body.type||'application/octet-stream'});
+        const result=await uploadFileToBlob(slot,file,p=>setStatus(`Migrando ${i+1}/${pending.length}: ${label} — ${p}%`));
+        setValue(result.url);
+      }
+
+      const saveResponse=await fetch('/api/panel/config',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(next)});
+      const saveData=await saveResponse.json();
+      if(!saveResponse.ok) throw new Error(saveData.error||'Falha ao salvar a configuração migrada.');
+      setConfig(next);
+      setRawJson(JSON.stringify(next,null,2));
+      setStatus(`Migração concluída: ${pending.length} mídia(s) movida(s) para o Blob e config.json atualizado no GitHub.`);
+    }catch(err){
+      setStatus(`Erro na migração: ${err instanceof Error?err.message:String(err)}`);
+    }finally{
+      setUploading('');
+      setMigratingMedia(false);
+    }
+  }
+
 
   async function save(){
     setSaving(true);setStatus('');
@@ -174,7 +244,7 @@ export default function PanelPage() {
     <div className="panelWrap">
       <section className="panelCard"><h2>Perfil</h2><div className="panelGrid2"><Field label="Nome"><TextInput value={config.profile.name||''} onChange={e=>patchProfile('name',e.target.value)}/></Field><Field label="@ usuário"><TextInput value={config.profile.username||''} onChange={e=>patchProfile('username',e.target.value)}/></Field><Field label="Texto/logo do topo"><TextInput value={config.profile.brandText||''} onChange={e=>patchProfile('brandText',e.target.value)}/></Field><Field label="Bloqueio entre cliques (ms)"><TextInput type="number" min="0" value={config.interaction.clickLockMs??300} onChange={e=>setConfig(c=>({...c,interaction:{...c.interaction,clickLockMs:Number(e.target.value)}}))}/></Field></div><Field label="Bio — uma linha por linha"><TextArea rows={11} value={(config.profile.bio||[]).join('\n')} onChange={e=>patchProfile('bio',e.target.value.split('\n'))}/></Field><div className="panelGrid3"><Field label="Instagram"><TextInput value={config.profile.socials.instagram||''} onChange={e=>patchSocial('instagram',e.target.value)}/></Field><Field label="X"><TextInput value={config.profile.socials.x||''} onChange={e=>patchSocial('x',e.target.value)}/></Field><Field label="TikTok"><TextInput value={config.profile.socials.tiktok||''} onChange={e=>patchSocial('tiktok',e.target.value)}/></Field></div><p className="panelHint">OBS: deixe o link vazio para o botão ficar apenas visual, sem redirecionamento.</p></section>
 
-      <section className="panelCard"><h2>Mídias principais</h2><UploadRow label="Foto de perfil" value={config.media.profile||'/profile.jpg'} slot="profile" accept="image/*" onChange={v=>patchMedia('profile',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('profile',v),config.media.profile||'/profile.jpg')} busy={uploading==='profile'}/><UploadRow label="Capa" value={config.media.cover||'/cover.jpg'} slot="cover" accept="image/*" onChange={v=>patchMedia('cover',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('cover',v),config.media.cover||'/cover.jpg')} busy={uploading==='cover'}/><UploadRow label="Logo topo" value={config.media.brandLogo||'/brunadcarv.png'} slot="brand-logo" accept="image/*" onChange={v=>patchMedia('brandLogo',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('brandLogo',v),config.media.brandLogo||'/brunadcarv.png')} busy={uploading==='brand-logo'}/><UploadRow label="Áudio boas-vindas" value={config.audio.src||''} slot="welcome-audio" accept="audio/*" onChange={v=>setConfig(c=>({...c,audio:{...c.audio,src:v}}))} onUpload={(s,f)=>upload(s,f,v=>setConfig(c=>({...c,audio:{...c.audio,src:v}})),config.audio.src||'/AudioBoasVindas.ogg')} busy={uploading==='welcome-audio'}/></section>
+      <section className="panelCard"><h2>Mídias principais</h2><UploadRow label="Foto de perfil" value={config.media.profile||'/profile.jpg'} slot="profile" accept="image/*" onChange={v=>patchMedia('profile',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('profile',v),config.media.profile||'/profile.jpg')} busy={uploading==='profile'}/><UploadRow label="Capa" value={config.media.cover||'/cover.jpg'} slot="cover" accept="image/*" onChange={v=>patchMedia('cover',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('cover',v),config.media.cover||'/cover.jpg')} busy={uploading==='cover'}/><UploadRow label="Logo topo" value={config.media.brandLogo||'/brunadcarv.png'} slot="brand-logo" accept="image/*" onChange={v=>patchMedia('brandLogo',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('brandLogo',v),config.media.brandLogo||'/brunadcarv.png')} busy={uploading==='brand-logo'}/><UploadRow label="Estatísticas do perfil" value={config.media.heroStats||'/hero-stats.png'} slot="hero-stats" accept="image/*" onChange={v=>patchMedia('heroStats',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('heroStats',v),config.media.heroStats||'/hero-stats.png')} busy={uploading==='hero-stats'}/><UploadRow label="Ícones/ações das postagens" value={config.media.postActions||'/post-actions.png'} slot="post-actions" accept="image/*" onChange={v=>patchMedia('postActions',v)} onUpload={(s,f)=>upload(s,f,v=>patchMedia('postActions',v),config.media.postActions||'/post-actions.png')} busy={uploading==='post-actions'}/><UploadRow label="Áudio boas-vindas" value={config.audio.src||''} slot="welcome-audio" accept="audio/*" onChange={v=>setConfig(c=>({...c,audio:{...c.audio,src:v}}))} onUpload={(s,f)=>upload(s,f,v=>setConfig(c=>({...c,audio:{...c.audio,src:v}})),config.audio.src||'/AudioBoasVindas.ogg')} busy={uploading==='welcome-audio'}/><div className="panelMigrationBox"><strong>Migrar mídias antigas do GitHub para o Blob</strong><p>Move automaticamente todos os arquivos locais ainda usados pela LP para o Vercel Blob e atualiza o config.json.</p><button className="panelSecondary" type="button" disabled={migratingMedia||!!uploading} onClick={migrateLegacyMedia}>{migratingMedia?'Migrando mídias…':'Migrar tudo para o Blob'}</button></div></section>
 
       <section className="panelCard"><h2>Contadores</h2><div className="panelGrid2"><Field label="Postagens"><TextInput type="number" value={config.counts.posts??0} onChange={e=>setConfig(c=>({...c,counts:{...c.counts,posts:Number(e.target.value)}}))}/></Field><Field label="Mídias"><TextInput type="number" value={config.counts.media??0} onChange={e=>setConfig(c=>({...c,counts:{...c.counts,media:Number(e.target.value)}}))}/></Field></div></section>
 
@@ -195,7 +265,7 @@ export default function PanelPage() {
         <Field label="Texto"><TextArea rows={2} value={config.orderBump.lead||''} onChange={e=>setConfig(c=>({...c,orderBump:{...c.orderBump,lead:e.target.value}}))}/></Field>
         <Field label="Descrição / benefícios — um por linha"><TextArea rows={5} value={(config.orderBump.benefits||[]).join('\n')} onChange={e=>setConfig(c=>({...c,orderBump:{...c.orderBump,benefits:e.target.value.split('\n')}}))}/></Field>
         <div className="panelGrid2"><Field label="Texto do botão incluir"><TextInput value={config.orderBump.includeButton||''} onChange={e=>setConfig(c=>({...c,orderBump:{...c.orderBump,includeButton:e.target.value}}))}/></Field><Field label="Texto do botão sem adicional"><TextInput value={config.orderBump.skipButton||''} onChange={e=>setConfig(c=>({...c,orderBump:{...c.orderBump,skipButton:e.target.value}}))}/></Field></div>
-        {config.orderBump.media.map((item,i)=><div className="panelPost" key={i}><h3>Mídia {i+1}</h3><UploadRow label="Arquivo (foto ou vídeo)" value={item.src||''} slot={`bump-${i+1}`} accept="image/*,video/*" onChange={v=>patchBumpMedia(i,'src',v)} onUpload={(s,f)=>upload(s,f,v=>patchBumpMedia(i,'src',v),item.src||'')} busy={uploading===`bump-${i+1}`}/><Field label="Legenda"><TextInput value={item.caption||''} onChange={e=>patchBumpMedia(i,'caption',e.target.value)}/></Field>{/\.(mp4|webm|mov)$/i.test(item.src||'')&&<UploadRow label="Poster do vídeo (opcional)" value={item.poster||''} slot={`bump-poster-${i+1}`} accept="image/*" onChange={v=>patchBumpMedia(i,'poster',v)} onUpload={(s,f)=>upload(s,f,v=>patchBumpMedia(i,'poster',v),item.poster||'')} busy={uploading===`bump-poster-${i+1}`}/>}</div>)}
+        {config.orderBump.media.map((item,i)=><div className="panelPost" key={i}><div className="panelSectionHead"><h3>Mídia {i+1}</h3><label className="panelCheck"><input type="checkbox" checked={item.enabled!==false} onChange={e=>patchBumpMedia(i,'enabled',e.target.checked)}/> Habilitar mídia</label></div><UploadRow label="Arquivo (foto ou vídeo)" value={item.src||''} slot={`bump-${i+1}`} accept="image/*,video/*" onChange={v=>patchBumpMedia(i,'src',v)} onUpload={(s,f)=>upload(s,f,v=>patchBumpMedia(i,'src',v),item.src||'')} busy={uploading===`bump-${i+1}`}/><Field label="Legenda"><TextInput value={item.caption||''} onChange={e=>patchBumpMedia(i,'caption',e.target.value)}/></Field><p className="panelHint">Foto e vídeo funcionam no mesmo campo. Vídeos usam um frame automático como capa; não é necessário poster separado.</p></div>)}
       </section>
 
       <section className="panelCard panelAdvanced"><details><summary>JSON completo (avançado)</summary><p>Edite qualquer campo não exposto acima e clique em Aplicar JSON.</p><TextArea rows={24} value={rawJson} onChange={e=>setRawJson(e.target.value)}/><button className="panelTopApply" type="button" onClick={()=>{try{setConfig(JSON.parse(rawJson));setStatus('JSON aplicado. Clique em Salvar alterações para gravar.')}catch{setStatus('Erro: JSON inválido.')}}}>Aplicar JSON</button></details></section>

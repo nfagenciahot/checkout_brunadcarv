@@ -1,4 +1,4 @@
-import { get } from '@vercel/blob';
+import { issueSignedToken, presignUrl } from '@vercel/blob';
 import { NextResponse } from 'next/server';
 
 function safePath(parts) {
@@ -16,41 +16,28 @@ export async function GET(request, { params }) {
     const pathname = safePath(resolved?.pathname);
     if (!pathname) return new NextResponse('Mídia inválida.', { status: 400 });
 
-    const result = await get(pathname, {
-      access: 'private',
-      ifNoneMatch: request.headers.get('if-none-match') || undefined,
+    const validUntil = Date.now() + 60 * 60 * 1000;
+    const token = await issueSignedToken({
+      pathname,
+      operations: ['get'],
+      validUntil,
+    });
+    const { presignedUrl } = await presignUrl(token, {
+      pathname,
+      operation: 'get',
+      validUntil,
     });
 
-    if (!result) return new NextResponse('Mídia não encontrada.', { status: 404 });
-
-    if (result.statusCode === 304) {
-      return new NextResponse(null, {
-        status: 304,
-        headers: {
-          ETag: result.blob.etag,
-          'Cache-Control': 'public, max-age=86400, immutable',
-        },
-      });
-    }
-
-    if (result.statusCode !== 200 || !result.stream) {
-      return new NextResponse('Mídia não encontrada.', { status: 404 });
-    }
-
-    const headers = new Headers({
-      'Content-Type': result.blob.contentType || 'application/octet-stream',
-      'X-Content-Type-Options': 'nosniff',
-      ETag: result.blob.etag,
-      'Cache-Control': 'public, max-age=86400, immutable',
+    return new NextResponse(null, {
+      status: 307,
+      headers: {
+        Location: presignedUrl,
+        'Cache-Control': 'private, max-age=300',
+        'X-Content-Type-Options': 'nosniff',
+      },
     });
-
-    if (Number.isFinite(result.blob.size)) {
-      headers.set('Content-Length', String(result.blob.size));
-    }
-
-    return new NextResponse(result.stream, { status: 200, headers });
   } catch (error) {
-    console.error('[Blob media]', error);
+    console.error('[Blob media redirect]', error);
     return new NextResponse('Falha ao carregar mídia.', { status: 500 });
   }
 }
