@@ -1,0 +1,15 @@
+V30 — CORREÇÃO STREAMING BLOB
+
+1. Corrigido signed GET do Blob Private:
+   - access: 'private'
+   - storeId explícito via BLOB_STORE_ID
+   - evita host *.undefined.blob.vercel-storage.com
+
+2. Corrigidas requisições duplicadas:
+   - app/page.js inicia diretamente com public/config.json da build
+   - não renderiza primeiro /postagem1.mp4 etc. para depois trocar para Blob
+
+3. Player não fica com spinner infinito em caso de erro real de mídia.
+
+Não altera public/config.json.
+Não requer npm install.
