@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { upload as uploadBlob } from '@vercel/blob/client';
+import { uploadPresigned as uploadBlob } from '@vercel/blob/client';
 
 const emptySub = (i) => ({ id: `plano${i}`, enabled: false, name: '', price: 0, delivery: { enabled:true, type:'telegram', chatId:'', chatTitle:'', chatType:'', verified:false, canInviteUsers:false } });
 const emptyPost = (i) => ({ id: i, enabled: false, media: '', likedBy: '', likedByAvatar: `curtiu${Math.min(i,3)}`, description: '' });

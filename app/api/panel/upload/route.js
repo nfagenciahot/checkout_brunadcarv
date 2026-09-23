@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { handleUpload } from '@vercel/blob/client';
+import { issueSignedToken } from '@vercel/blob';
+import { handleUploadPresigned } from '@vercel/blob/client';
 import { PANEL_COOKIE, verifyPanelSession } from '../../../../lib/panelAuth';
 
 const SAFE_SLOT = /^[a-zA-Z0-9_-]{1,40}$/;
+const MAX_UPLOAD_BYTES = 500 * 1024 * 1024;
 
 function allowedTypesForSlot(slot) {
   if (slot === 'welcome-audio') return ['audio/*'];
@@ -21,10 +23,10 @@ export async function POST(request) {
   try {
     const body = await request.json();
 
-    const jsonResponse = await handleUpload({
+    const jsonResponse = await handleUploadPresigned({
       body,
       request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
+      getSignedToken: async (pathname, clientPayload) => {
         if (!(await panelAuthorized())) {
           throw new Error('Não autorizado. Faça login novamente no /panel.');
         }
@@ -44,22 +46,34 @@ export async function POST(request) {
           throw new Error('Destino de upload inválido.');
         }
 
-        return {
+        const token = await issueSignedToken({
+          pathname,
+          operations: ['put'],
           allowedContentTypes: allowedTypesForSlot(slot),
-          maximumSizeInBytes: 500 * 1024 * 1024,
-          addRandomSuffix: true,
-          cacheControlMaxAge: 30 * 24 * 60 * 60,
-          tokenPayload: JSON.stringify({ slot }),
+          maximumSizeInBytes: MAX_UPLOAD_BYTES,
+          validUntil: Date.now() + 15 * 60 * 1000,
+        });
+
+        return {
+          token,
+          urlOptions: {
+            access: 'private',
+            addRandomSuffix: true,
+            allowOverwrite: false,
+            cacheControlMaxAge: 30 * 24 * 60 * 60,
+            tokenPayload: JSON.stringify({ slot }),
+          },
         };
       },
       onUploadCompleted: async () => {
-        // O config.json continua sendo salvo pelo botão "Salvar alterações".
-        // O upload em si já está persistido no Blob neste ponto.
+        // A mídia já está persistida no Blob.
+        // O config.json continua sendo publicado pelo botão "Salvar alterações".
       },
     });
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
+    console.error('[Panel Blob presigned upload]', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 400 },
