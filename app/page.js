@@ -246,7 +246,10 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
 
   function markFrameReady(video){
     if(typeof video.requestVideoFrameCallback==='function'){
-      video.requestVideoFrameCallback(()=>setFrameReady(true));
+      let done=false;
+      const finish=()=>{if(!done){done=true;setFrameReady(true);}};
+      video.requestVideoFrameCallback(finish);
+      setTimeout(finish,600);
     } else {
       setFrameReady(true);
     }
