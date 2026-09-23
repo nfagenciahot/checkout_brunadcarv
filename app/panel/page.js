@@ -142,7 +142,7 @@ export default function PanelPage() {
     });
 
     return {
-      url: blob.url,
+      url:`/api/media/${blob.pathname.split('/').map(encodeURIComponent).join('/')}`,
       blobPathname:blob.pathname,
     };
   }
