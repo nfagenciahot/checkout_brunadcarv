@@ -83,9 +83,9 @@
     },
     {
       "id": "plano4",
-      "enabled": false,
-      "name": "",
-      "price": 0,
+      "enabled": true,
+      "name": "Teste",
+      "price": 2,
       "delivery": {
         "enabled": true,
         "type": "telegram",
