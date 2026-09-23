@@ -98,7 +98,7 @@
     }
   ],
   "audio": {
-    "src": "/AudioBoasVindas.ogg",
+    "src": "/api/media/panel-media/welcome-audio/1790197721050-audioboasvindas-PI12QpzX6TV2sHg6n1i0F3fcy7iamJ.ogg",
     "ariaLabel": "Áudio de boas-vindas"
   },
   "posts": [
@@ -150,12 +150,12 @@
     "media": [
       {
         "enabled": false,
-        "src": "/bump-1.jpg",
+        "src": "/api/media/panel-media/bump-1/1790197728851-bump-1-8e7o3VbOwGilbetwMurJ6DJhrU9cse.jpg",
         "caption": "1 Foto personalizada"
       },
       {
         "enabled": true,
-        "src": "/bump-2.mp4",
+        "src": "/api/media/panel-media/bump-2/1790197730775-bump-2-HoTiTy5jJS6ZYAAKgyHkWaMKc5hp2f.mp4",
         "caption": "+50 vídeos especiais"
       }
     ]
@@ -181,20 +181,20 @@
     "pixTimeoutMinutes": 20
   },
   "likedByAvatars": {
-    "curtiu1": "/curtiu1.jpg",
-    "curtiu2": "/curtiu2.jpg",
-    "curtiu3": "/curtiu3.jpg"
+    "curtiu1": "/api/media/panel-media/curtiu1/1790197722827-curtiu1-lwgQdxqNeHra37K6ROvdI9XigvlLCu.jpg",
+    "curtiu2": "/api/media/panel-media/curtiu2/1790197726441-curtiu2-jozubmgGRE9YJ0Ud0Eyy7yGJBdhz9s.jpg",
+    "curtiu3": "/api/media/panel-media/curtiu3/1790197727832-curtiu3-xtnKvCXGJSQnT8N9VtJqmibSAUbace.jpg"
   },
   "interaction": {
     "clickLockMs": 300
   },
   "media": {
-    "profile": "/profile.jpg",
-    "cover": "/cover.jpg",
-    "brandLogo": "/brunadcarv.png",
-    "heroStats": "/hero-stats.png",
-    "postActions": "/post-actions.png",
-    "vipPost": "/vip-post.png",
-    "vipGrid": "/vip-grid.png"
+    "profile": "/api/media/panel-media/profile/1790197705113-profile-8MawdWdHrCToWDzT0fSoYo05UFmniP.jpg",
+    "cover": "/api/media/panel-media/cover/1790197707958-cover-xFxXE3G2P3PCFSOkk6tmkbfvPHPAnm.jpg",
+    "brandLogo": "/api/media/panel-media/brand-logo/1790197710219-brunadcarv-OORsvn2VklGGn7zbhJzaUOBbjEGfHu.png",
+    "heroStats": "/api/media/panel-media/hero-stats/1790197712473-hero-stats-ed7xCgTMrEuVlEdCgvgvcqKm9WFMhj.png",
+    "postActions": "/api/media/panel-media/post-actions/1790197713566-post-actions-4yXYShWCqo7B2GKn8C4QQlb0W9w0zp.png",
+    "vipPost": "/api/media/panel-media/vip-post/1790197715294-vip-post-wkDWmfedrf19OHxkwFdbgHrsOIrX5d.png",
+    "vipGrid": "/api/media/panel-media/vip-grid/1790197718846-vip-grid-e5vqrhgIE1oPfWGjJrWqxUHJEuvq7n.png"
   }
 }
