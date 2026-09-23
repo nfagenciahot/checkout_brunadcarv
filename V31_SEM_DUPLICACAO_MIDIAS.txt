@@ -1,0 +1,9 @@
+V31
+
+- A LP não renderiza mais mídias do DEFAULT_CONFIG antes do config real carregar.
+- Isso elimina o efeito: imagem antiga aparece e depois some.
+- /api/site-config entrega o config já com URLs GET assinadas do Blob Private.
+- O navegador passa a buscar cada mídia diretamente no Blob.
+- A rota /api/media continua somente como fallback.
+- Não altera public/config.json.
+- Não exige npm install.

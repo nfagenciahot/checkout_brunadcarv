@@ -37,6 +37,34 @@ const DEFAULT_CONFIG = {
   media:{profile:'/profile.jpg',cover:'/cover.jpg',brandLogo:'/brunadcarv.png',heroStats:'/hero-stats.png',postActions:'/post-actions.png',vipPost:'/vip-post.png',vipGrid:'/vip-grid.png'}
 };
 
+
+function mergeSiteConfig(data = {}) {
+  return {
+    ...DEFAULT_CONFIG,
+    ...data,
+    profile: {
+      ...DEFAULT_CONFIG.profile,
+      ...(data.profile || {}),
+      socials: {
+        ...DEFAULT_CONFIG.profile.socials,
+        ...(data.profile?.socials || {}),
+      },
+    },
+    counts: { ...DEFAULT_CONFIG.counts, ...(data.counts || {}) },
+    labels: { ...DEFAULT_CONFIG.labels, ...(data.labels || {}) },
+    audio: { ...DEFAULT_CONFIG.audio, ...(data.audio || {}) },
+    lockedPost: { ...DEFAULT_CONFIG.lockedPost, ...(data.lockedPost || {}) },
+    orderBump: { ...DEFAULT_CONFIG.orderBump, ...(data.orderBump || {}) },
+    checkout: { ...DEFAULT_CONFIG.checkout, ...(data.checkout || {}) },
+    interaction: { ...DEFAULT_CONFIG.interaction, ...(data.interaction || {}) },
+    media: { ...DEFAULT_CONFIG.media, ...(data.media || {}) },
+    likedByAvatars: {
+      ...DEFAULT_CONFIG.likedByAvatars,
+      ...(data.likedByAvatars || {}),
+    },
+  };
+}
+
 const POST_EXTENSIONS = ['mp4','webm','mov','jpg','jpeg','png','webp'];
 
 function money(value) { return `R$ ${Number(value || 0).toFixed(2).replace('.', ',')}`; }
@@ -187,6 +215,7 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
   const [frameReady,setFrameReady]=useState(false);
   const [started,setStarted]=useState(false);
   const [loading,setLoading]=useState(false);
+  const [mediaError,setMediaError]=useState(false);
 
   useEffect(()=>{
     primedRef.current=false;
@@ -194,6 +223,7 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
     setFrameReady(false);
     setStarted(false);
     setLoading(false);
+    setMediaError(false);
   },[src]);
 
   useEffect(()=>{
@@ -266,8 +296,9 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
       onSeeked={e=>{if(!started)markFrameReady(e.currentTarget)}}
       onCanPlay={()=>{if(started)setLoading(false)}}
       onPlaying={()=>setLoading(false)}
+      onError={()=>{setLoading(false);setMediaError(true);setFrameReady(true)}}
     />
-    {!frameReady && !started && <span className="videoFrameLoading" aria-hidden="true"/>}
+    {!frameReady && !started && !mediaError && <span className="videoFrameLoading" aria-hidden="true"/>}
     {!started && frameReady && <button className="smartVideoPlay" type="button" onClick={activate} aria-label={ariaLabel}><IconPlay/></button>}
     {loading && <span className="videoPlayLoading" aria-hidden="true"/>}
     {showDuration && <span className="videoDuration">{formatDuration(duration)}</span>}
@@ -314,6 +345,7 @@ function PostMeta({ config, likedBy, description, likedByAvatar }) {
 
 export default function HomePage(){
   const [config,setConfig]=useState(DEFAULT_CONFIG);
+  const [configReady,setConfigReady]=useState(false);
   const [modalStep,setModalStep]=useState(null);
   const [selectedPlan,setSelectedPlan]=useState(null);
   const [includeBump,setIncludeBump]=useState(false);
@@ -334,7 +366,28 @@ export default function HomePage(){
   const deliveryRequestedRef=useRef(false);
   const lastAcceptedClickRef=useRef(0);
 
-  useEffect(()=>{fetch('/config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(data)setConfig({...DEFAULT_CONFIG,...data,profile:{...DEFAULT_CONFIG.profile,...data.profile,socials:{...DEFAULT_CONFIG.profile.socials,...(data.profile?.socials||{})}},counts:{...DEFAULT_CONFIG.counts,...data.counts},labels:{...DEFAULT_CONFIG.labels,...data.labels},audio:{...DEFAULT_CONFIG.audio,...data.audio},lockedPost:{...DEFAULT_CONFIG.lockedPost,...data.lockedPost},orderBump:{...DEFAULT_CONFIG.orderBump,...data.orderBump},checkout:{...DEFAULT_CONFIG.checkout,...data.checkout},interaction:{...DEFAULT_CONFIG.interaction,...data.interaction},media:{...DEFAULT_CONFIG.media,...(data.media||{})},likedByAvatars:{...DEFAULT_CONFIG.likedByAvatars,...(data.likedByAvatars||{})}})}).catch(()=>{});},[]);
+  useEffect(()=>{
+    let cancelled=false;
+    async function loadConfig(){
+      try{
+        const res=await fetch('/api/site-config',{cache:'no-store'});
+        if(!res.ok) throw new Error(`Config ${res.status}`);
+        const data=await res.json();
+        if(!cancelled && data) setConfig(mergeSiteConfig(data));
+      }catch(error){
+        console.error('[site-config]',error);
+        try{
+          const fallback=await fetch('/config.json',{cache:'no-store'});
+          const data=fallback.ok ? await fallback.json() : null;
+          if(!cancelled && data) setConfig(mergeSiteConfig(data));
+        }catch(_){}
+      }finally{
+        if(!cancelled) setConfigReady(true);
+      }
+    }
+    loadConfig();
+    return()=>{cancelled=true};
+  },[]);
   useEffect(()=>{document.body.style.overflow=(modalStep||previewMedia)?'hidden':'';return()=>{document.body.style.overflow=''}},[modalStep,previewMedia]);
   useEffect(()=>{
     const handleClick=(event)=>{
@@ -429,10 +482,11 @@ export default function HomePage(){
   },[modalStep,orderSession,orderState?.status]);
 
   useEffect(()=>{
+    if(!configReady) return;
     let cancelled=false;
     async function discoverPosts(){const found=[];for(let i=1;i<=3;i++){const meta=(config.posts||[]).find(p=>Number(p.id)===i)||{};if(meta.enabled===false)continue;let match=null;if(meta.media){const src=meta.media;match={id:i,src,type:isVideoPath(src)?'video':'image',likedBy:meta.likedBy||'luccho.co',likedByAvatar:meta.likedByAvatar||'curtiu1',description:meta.description||''};}else{for(const ext of POST_EXTENSIONS){const src=`/postagem${i}.${ext}`;try{const response=await fetch(src,{method:'HEAD',cache:'no-store'});if(response.ok){match={id:i,src,type:isVideoPath(src)?'video':'image',likedBy:meta.likedBy||'luccho.co',likedByAvatar:meta.likedByAvatar||'curtiu1',description:meta.description||''};break;}}catch(_){}}}if(match)found.push(match)}if(!cancelled)setPosts(found)}
     discoverPosts();return()=>{cancelled=true};
-  },[config.posts]);
+  },[configReady,config.posts]);
 
   const subscriptions=(config.subscriptions||[]).filter(s=>s.enabled!==false).slice(0,4);
   const bumpPrice=Number(config.orderBump?.price||0);
@@ -501,6 +555,10 @@ export default function HomePage(){
   },[modalStep,orderState?.checkoutExpiresAt]);
 
   const checkoutLocked=['pix','delivery','manual_delivery','delivered'].includes(modalStep);
+
+  if(!configReady){
+    return <main className="page" aria-busy="true" style={{minHeight:'100vh'}} />;
+  }
 
   return <main className="page">
     <div className="container profileShell">

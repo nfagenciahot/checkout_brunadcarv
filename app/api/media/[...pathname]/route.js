@@ -17,14 +17,17 @@ export async function GET(request, { params }) {
     if (!pathname) return new NextResponse('Mídia inválida.', { status: 400 });
 
     const validUntil = Date.now() + 60 * 60 * 1000;
+
     const token = await issueSignedToken({
       pathname,
       operations: ['get'],
       validUntil,
     });
+
     const { presignedUrl } = await presignUrl(token, {
       pathname,
       operation: 'get',
+      access: 'private',
       validUntil,
     });
 
