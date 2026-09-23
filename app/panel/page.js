@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { upload as uploadBlob } from '@vercel/blob/client';
 
 const emptySub = (i) => ({ id: `plano${i}`, enabled: false, name: '', price: 0, delivery: { enabled:true, type:'telegram', chatId:'', chatTitle:'', chatType:'', verified:false, canInviteUsers:false } });
 const emptyPost = (i) => ({ id: i, enabled: false, media: '', likedBy: '', likedByAvatar: `curtiu${Math.min(i,3)}`, description: '' });
@@ -123,14 +124,33 @@ export default function PanelPage() {
   function patchBumpMedia(index,key,value){setConfig(c=>{const media=[...(c.orderBump.media||[])];media[index]={...media[index],[key]:value};return {...c,orderBump:{...c.orderBump,media}};});}
 
   async function upload(slot,file,apply,currentUrl=''){
-    setUploading(slot);setStatus('');
+    setUploading(slot);setStatus('Preparando upload…');
     try{
-      const fd=new FormData();fd.append('slot',slot);fd.append('file',file);fd.append('currentUrl',currentUrl||'');
-      const r=await fetch('/api/panel/upload',{method:'POST',body:fd});const d=await r.json();
-      if(!r.ok)throw new Error(d.error||'Falha no upload');
-      apply(d.url);setStatus(d.mode==='github'?'Nova mídia enviada ao GitHub. A prévia acima já foi atualizada; a LP pública muda após o deploy da Vercel.':'Upload salvo. A prévia acima já foi atualizada.');
-      return d;
-    }catch(err){setStatus(`Erro: ${err.message}`);throw err}finally{setUploading('')}
+      const rawName=String(file?.name||'arquivo.bin');
+      const dot=rawName.lastIndexOf('.');
+      const ext=dot>=0?rawName.slice(dot).toLowerCase().replace(/[^.a-z0-9]/g,''):'';
+      const stem=(dot>=0?rawName.slice(0,dot):rawName)
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase().replace(/[^a-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'') || 'arquivo';
+      const pathname=`panel-media/${slot}/${Date.now()}-${stem}${ext}`;
+
+      const blob=await uploadBlob(pathname,file,{
+        access:'private',
+        handleUploadUrl:'/api/panel/upload',
+        clientPayload:JSON.stringify({slot}),
+        multipart:file.size>100*1024*1024,
+        onUploadProgress:({percentage})=>setStatus(`Enviando para o Blob… ${Math.round(percentage||0)}%`),
+      });
+
+      const publicUrl=`/api/media/${blob.pathname.split('/').map(encodeURIComponent).join('/')}`;
+      apply(publicUrl);
+      setStatus('Upload concluído no Vercel Blob. Clique em Salvar alterações para publicar esta mídia na LP.');
+      return {ok:true,url:publicUrl,blobPathname:blob.pathname,mode:'blob'};
+    }catch(err){
+      const message=err instanceof Error?err.message:String(err);
+      setStatus(`Erro no upload: ${message}`);
+      throw err;
+    }finally{setUploading('')}
   }
 
   async function save(){

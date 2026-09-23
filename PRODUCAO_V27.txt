@@ -1,0 +1,10 @@
+V27 - Vercel Blob Private
+
+- Uploads do /panel agora vão direto do navegador para o Vercel Blob Private.
+- Arquivos grandes não passam pelo limite de payload das Vercel Functions.
+- O endpoint /api/panel/upload apenas autentica o painel e emite o token de upload.
+- A LP entrega as mídias privadas através de /api/media/[...pathname].
+- config.json continua no GitHub e é salvo pelo botão "Salvar alterações".
+- Redis continua responsável por pedidos, PIX e token privado do Telegram.
+- Upload máximo configurado: 500 MB.
+- Multipart é ativado automaticamente para arquivos acima de 100 MB.
