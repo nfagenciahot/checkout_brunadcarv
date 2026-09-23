@@ -1,0 +1,18 @@
+node_modules
+.next
+.vercel
+.env.local
+.env.*.local
+npm-debug.log*
+.DS_Store
+
+# Segredos configurados pelo /panel (não enviar ao Git)
+data/private-config.json
+
+# Pedidos locais / armazenamento temporário
+data/kv/
+data/orders/
+
+.env
+.env.production
+.env.development

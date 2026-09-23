@@ -1,0 +1,33 @@
+BRUNADIAS LP - DEPLOY VERCEL
+
+1) Envie esta pasta ao repositório GitHub:
+   nfagenciahot/checkout_brunadcarv
+
+2) Importe o repositório na Vercel.
+
+3) Em Vercel > Project > Settings > Environment Variables, configure:
+   PANEL_USER
+   PANEL_PASSWORD
+   PANEL_SESSION_SECRET
+   GITHUB_TOKEN
+   GITHUB_OWNER=nfagenciahot
+   GITHUB_REPO=checkout_brunadcarv
+   GITHUB_BRANCH=main
+   SITE_URL=https://brunadcarv.online
+   OMEGAPAY_PUBLIC_KEY
+   OMEGAPAY_SECRET_KEY
+   OMEGAPAY_DOCUMENT
+   UPSTASH_REDIS_REST_URL
+   UPSTASH_REDIS_REST_TOKEN
+   TELEGRAM_BOT_TOKEN
+
+4) OMEGAPAY_CALLBACK_URL pode ficar vazio. O site enviará automaticamente:
+   https://brunadcarv.online/api/webhooks/omegapay
+
+5) Adicione brunadcarv.online em Vercel > Settings > Domains e copie os registros DNS indicados pela Vercel para a Hostinger.
+
+6) O PIX fica com sessão local de 20 minutos. Se expirar no site, o polling para. Se um pagamento for confirmado depois mesmo assim, o webhook ainda registra o pagamento e tenta realizar a entrega.
+
+7) O webhook da OmegaPay tenta gerar o convite Telegram automaticamente. O convite tem limite de 1 membro e não possui expiração por tempo. Se a geração falhar, o pedido fica como entrega manual, sem perder a venda.
+
+8) O /panel em produção precisa do GITHUB_TOKEN para salvar arquivos/configuração no repositório. Cada alteração no GitHub dispara novo deploy da Vercel.

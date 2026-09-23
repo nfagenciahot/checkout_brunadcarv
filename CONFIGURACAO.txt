@@ -1,0 +1,24 @@
+EDITE O ARQUIVO: public/config.json
+
+O que você pode trocar sem mexer no código:
+- Nome da modelo
+- @ / username
+- Bio
+- Contadores de Postagens e Mídias
+- Nomes e valores das assinaturas
+- Quantidade de assinaturas (1 a 4): basta deixar de 1 a 4 itens com "enabled": true em "subscriptions"
+- Texto / pessoa que curtiu / descrição das postagens 1, 2 e 3
+- Textos do post VIP bloqueado
+- Textos do order bump
+- Textos do checkout
+- Arquivo do áudio de boas-vindas
+
+POSTAGENS:
+Coloque os arquivos em public/ com o nome postagem1, postagem2 e postagem3.
+Extensões aceitas: mp4, webm, mov, jpg, jpeg, png e webp.
+Se existir só postagem1, aparece 1 postagem. Se existirem 3, aparecem 3.
+O post VIP bloqueado aparece sempre.
+
+ÁUDIO:
+Por padrão: public/AudioBoasVindas.ogg
+A waveform é gerada automaticamente do próprio áudio no navegador.

@@ -1,0 +1,5 @@
+V20
+- PIX não é bloqueado caso o Telegram do plano não esteja configurado.
+- Se o convite Telegram falhar ou estiver sem canal, o pedido fica em manual_delivery.
+- O pagamento continua confirmado e a LP informa que o suporte fará a entrega manual.
+- Credenciais OmegaPay continuam em .env.local no desenvolvimento e devem ir para Environment Variables na Vercel.

@@ -1,0 +1,173 @@
+{
+  "profile": {
+    "name": "Bruna Dias",
+    "username": "bruna.dcarv",
+    "topTitle": "Bruna Dias",
+    "bio": [
+      "Vem conferir tudinho nos meus assinantes VIP🔥🔞",
+      "",
+      "♡ VIP 15 Dias",
+      "+ 15 Vídeos Exclusivos💎",
+      "",
+      "♡ VIP 30 Dias",
+      "+ 25 Vídeos Exclusivos💎",
+      "+ Pack com Amiguinhas",
+      "",
+      "Vem me ver peladinha e gozar comigo, estou toda molhadinha💦🔞"
+    ],
+    "brandText": "bruna.dcarv",
+    "socials": {
+      "instagram": "https://www.instagram.com/bruna.dcarv/",
+      "x": "",
+      "tiktok": ""
+    }
+  },
+  "counts": {
+    "posts": 207,
+    "media": 458
+  },
+  "labels": {
+    "subscriptions": "Assinaturas",
+    "posts": "Postagens",
+    "media": "Mídias",
+    "mediaFilters": [
+      "Todos",
+      "Fotos",
+      "Vídeos",
+      "Pagos"
+    ],
+    "likedBy": "Curtido por",
+    "others": "e outras pessoas"
+  },
+  "subscriptions": [
+    {
+      "id": "vip15",
+      "enabled": true,
+      "name": "♡ VIP 15 Dias + Vídeos 💎",
+      "price": 17.9,
+      "delivery": {
+        "enabled": true,
+        "type": "telegram",
+        "chatId": "",
+        "chatTitle": "",
+        "chatType": "",
+        "verified": false,
+        "canInviteUsers": false
+      }
+    },
+    {
+      "id": "vip30",
+      "enabled": true,
+      "name": "♡ VIP 30 Dias + Vídeos & Pack 💎",
+      "price": 34.9,
+      "delivery": {
+        "enabled": true,
+        "type": "telegram",
+        "chatId": "",
+        "chatTitle": "",
+        "chatType": "",
+        "verified": false,
+        "canInviteUsers": false
+      }
+    }
+  ],
+  "audio": {
+    "src": "/AudioBoasVindas.ogg",
+    "ariaLabel": "Áudio de boas-vindas"
+  },
+  "posts": [
+    {
+      "id": 1,
+      "likedBy": "luccho.ecom",
+      "description": "Bem-vindo ao meu conteúdo privado 💎🔥",
+      "likedByAvatar": "curtiu1",
+      "enabled": true,
+      "media": "/postagem1.mp4"
+    },
+    {
+      "id": 2,
+      "likedBy": "andresbarriles",
+      "description": "Tem conteúdo novo esperando por você 👀",
+      "likedByAvatar": "curtiu2",
+      "enabled": true,
+      "media": "/postagem2.mp4"
+    },
+    {
+      "id": 3,
+      "likedBy": "gabrieldamasceno",
+      "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥",
+      "likedByAvatar": "curtiu3",
+      "enabled": true,
+      "media": "/postagem3.mp4"
+    }
+  ],
+  "lockedPost": {
+    "title": "",
+    "likedBy": "luccho.ecom",
+    "description": "Assine o VIP para liberar todas as fotos e vídeos privados.",
+    "likedByAvatar": "curtiu1",
+    "enabled": true
+  },
+  "orderBump": {
+    "price": 6.9,
+    "eyebrow": "Oferta exclusiva para o seu VIP",
+    "title": "Tenho mais uma surpresinha esperando por você 🔥",
+    "lead": "Além do VIP você pode ter acesso a mais conteúdos especiais 💦",
+    "benefits": [
+      "♡ 1 Foto com seu nome na minha bunda",
+      "♡ 50 Vídeos safados com minhas amigas",
+      "♡ Acesso ao meu WhatsApp privado",
+      "♡ Grupo privado dos melhores conteúdos"
+    ],
+    "includeButton": "🔥 Incluir",
+    "skipButton": "🚫 Somente o VIP",
+    "media": [
+      {
+        "src": "/bump-1.jpg",
+        "caption": "1 Foto personalizada"
+      },
+      {
+        "src": "/bump-2.mp4",
+        "poster": "/bump-poster-2.jpg",
+        "caption": "+50 vídeos especiais"
+      }
+    ]
+  },
+  "checkout": {
+    "eyebrow": "Pagamento via PIX",
+    "title": "Finalizar compra",
+    "lead": "Preencha os dados abaixo para gerar o pagamento.",
+    "namePlaceholder": "Nome",
+    "pixButton": "Gerar PIX",
+    "pixTitle": "Pagamento via PIX",
+    "pixLead": "Escaneie o QR Code ou copie o código PIX abaixo. O acesso será liberado automaticamente após a confirmação.",
+    "copyPix": "Copiar PIX",
+    "back": "Voltar",
+    "bumpLabel": "Conteúdo especial",
+    "phonePlaceholder": "Telefone",
+    "processingTitle": "Pagamento confirmado ✓",
+    "processingLead": "Você receberá o acesso ao Telegram em alguns instantes.",
+    "telegramButton": "Entrar no Telegram",
+    "phoneError": "Informe um telefone válido com DDD.",
+    "manualDeliveryTitle": "Pagamento aprovado ✓",
+    "manualDeliveryLead": "Houve um problema ao gerar automaticamente o convite de acesso ao Telegram. Nosso suporte entrará em contato o mais breve possível para compartilhar seu acesso.",
+    "pixTimeoutMinutes": 20
+  },
+  "likedByAvatars": {
+    "curtiu1": "/curtiu1.jpg",
+    "curtiu2": "/curtiu2.jpg",
+    "curtiu3": "/curtiu3.jpg"
+  },
+  "interaction": {
+    "clickLockMs": 300
+  },
+  "media": {
+    "profile": "/profile.jpg",
+    "cover": "/cover.jpg",
+    "brandLogo": "/brunadcarv.png",
+    "heroStats": "/hero-stats.png",
+    "postActions": "/post-actions.png",
+    "vipPost": "/vip-post.png",
+    "vipGrid": "/vip-grid.png"
+  }
+}

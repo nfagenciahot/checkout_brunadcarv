@@ -1,0 +1,26 @@
+V19 — PIX + TELEGRAM
+
+Antes de publicar na Vercel, configure Environment Variables:
+
+OMEGAPAY_PUBLIC_KEY=...
+OMEGAPAY_SECRET_KEY=...
+SITE_URL=https://brunadcarv.online
+
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+
+PANEL_USER=...
+PANEL_PASSWORD=...
+PANEL_SESSION_SECRET=...
+
+Se o token do Telegram ainda não estiver salvo no armazenamento persistente, entre em /panel e salve o token depois que o Redis estiver configurado.
+
+Fluxo:
+1. Nome + telefone validados.
+2. Backend calcula valor pelo config.json.
+3. OmegaPay gera o PIX.
+4. Navegador salva apenas orderId + token de retomada.
+5. Webhook marca o pedido como pago.
+6. LP mostra processamento.
+7. Bot cria link Telegram com member_limit=1 e sem expire_date.
+8. LP mostra o botão Entrar no Telegram.
