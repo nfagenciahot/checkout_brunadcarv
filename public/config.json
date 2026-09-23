@@ -105,7 +105,7 @@
     {
       "id": 1,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem1/1790187950169-pronto-fUAyDke1gd1OJd1Kx6TPBFr0eRlD4u.mp4",
+      "media": "/api/media/panel-media/postagem1/1790197574859-pronto-tJ7jzC0vbCrTNsFRb0ICOyO5EaiImJ.mp4",
       "likedBy": "luccho.ecom",
       "likedByAvatar": "curtiu1",
       "description": "Bem-vindo ao meu conteúdo privado 💎🔥"
@@ -113,15 +113,15 @@
     {
       "id": 2,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem2/1790187902166-tela-completa-copia-1-CgVG5BYvvXce1wPHdZiK60AQu3GuWa.mp4",
+      "media": "/api/media/panel-media/postagem2/1790197582098-tela-completa-copia-1-MflqzkZE70EN6o9nJ0vZVyd5Zz78sz.mp4",
       "likedBy": "andresbarriles",
       "likedByAvatar": "curtiu2",
       "description": "Tem conteúdo novo esperando por você 👀"
     },
     {
       "id": 3,
-      "enabled": false,
-      "media": "/postagem3.mp4",
+      "enabled": true,
+      "media": "/api/media/panel-media/postagem3/1790197592910-tela-completa-copia-1--cover-FcVyTbTAWd4ditIoNNihRzkTW1Et8z.jpg",
       "likedBy": "gabrieldamasceno",
       "likedByAvatar": "curtiu3",
       "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥"
