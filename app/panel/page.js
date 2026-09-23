@@ -134,7 +134,7 @@ export default function PanelPage() {
     const pathname=`panel-media/${slot}/${Date.now()}-${stem}${ext}`;
 
     const blob=await uploadBlob(pathname,file,{
-      access:'private',
+      access:'public',
       handleUploadUrl:'/api/panel/upload',
       clientPayload:JSON.stringify({slot}),
       multipart:file.size>100*1024*1024,
@@ -142,7 +142,7 @@ export default function PanelPage() {
     });
 
     return {
-      url:`/api/media/${blob.pathname.split('/').map(encodeURIComponent).join('/')}`,
+      url: blob.url,
       blobPathname:blob.pathname,
     };
   }

@@ -57,7 +57,7 @@ export async function POST(request) {
         return {
           token,
           urlOptions: {
-            access: 'private',
+            access: 'public',
             addRandomSuffix: true,
             allowOverwrite: false,
             cacheControlMaxAge: 30 * 24 * 60 * 60,

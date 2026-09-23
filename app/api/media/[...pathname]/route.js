@@ -31,16 +31,27 @@ export async function GET(request, { params }) {
       validUntil,
     });
 
-    return new NextResponse(null, {
-      status: 307,
-      headers: {
-        Location: presignedUrl,
-        'Cache-Control': 'private, max-age=300',
-        'X-Content-Type-Options': 'nosniff',
-      },
+    // Retorna a mídia fazendo streaming direto para suportar range requests (vídeos)
+    const rangeHeader = request.headers.get('range');
+    const upstreamHeaders = {};
+    if (rangeHeader) upstreamHeaders['Range'] = rangeHeader;
+
+    const upstream = await fetch(presignedUrl, { headers: upstreamHeaders });
+
+    const responseHeaders = new Headers();
+    ['content-type', 'content-length', 'content-range', 'last-modified', 'etag'].forEach((h) => {
+      const v = upstream.headers.get(h);
+      if (v) responseHeaders.set(h, v);
+    });
+    responseHeaders.set('Accept-Ranges', 'bytes');
+    responseHeaders.set('Cache-Control', 'private, max-age=300');
+
+    return new NextResponse(upstream.body, {
+      status: upstream.status,
+      headers: responseHeaders,
     });
   } catch (error) {
-    console.error('[Blob media redirect]', error);
+    console.error('[Blob media proxy]', error);
     return new NextResponse('Falha ao carregar mídia.', { status: 500 });
   }
 }
