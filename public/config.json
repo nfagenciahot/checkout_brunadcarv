@@ -6,8 +6,8 @@
     "bio": [
       "Lindo… você entrou aqui porque sabe que merece ver o que os outros só ficam imaginando",
       "",
-      " 🔥Conteúdos quentes, brincadeiras com minhas amiguinhas e muito mais 💦",
-      " 🔞 Mais de 1.600 assinantes já estão aproveitando tudo… ♡",
+      "  🔥Conteúdos quentes, brincadeiras com minhas amiguinhas e muito mais 💦",
+      "  🔞 Mais de 1.600 assinantes já estão aproveitando tudo… ♡",
       "",
       "Enquanto você ainda tá aí só imaginando, tem gente lá dentro do VIP aproveitando cada detalhe ♡"
     ],
@@ -39,8 +39,8 @@
     {
       "id": "vip15",
       "enabled": true,
-      "name": "♡ VIP 15 Dias + Vídeos 💎",
-      "price": 17.9,
+      "name": "♡ Premium Privacy 🫂🎥",
+      "price": 119.9,
       "delivery": {
         "enabled": true,
         "type": "telegram",
@@ -54,8 +54,8 @@
     {
       "id": "vip30",
       "enabled": true,
-      "name": "♡ VIP 30 Dias + Vídeos & Pack 💎",
-      "price": 34.9,
+      "name": "♡ VIP 1 Mês + 1 Bônus 💎",
+      "price": 14.9,
       "delivery": {
         "enabled": true,
         "type": "telegram",
@@ -68,9 +68,9 @@
     },
     {
       "id": "plano3",
-      "enabled": false,
-      "name": "",
-      "price": 0,
+      "enabled": true,
+      "name": "♡ VIP 3 Meses + 2 Bônus 💎",
+      "price": 24.9,
       "delivery": {
         "enabled": true,
         "type": "telegram",
