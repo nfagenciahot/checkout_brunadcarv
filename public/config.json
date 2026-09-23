@@ -105,7 +105,7 @@
     {
       "id": 1,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem1/1790197574859-pronto-tJ7jzC0vbCrTNsFRb0ICOyO5EaiImJ.mp4",
+      "media": "https://r0haxgc1nbatgohz.private.blob.vercel-storage.com/panel-media/postagem1/1790202403145-pronto-z23icLS3KKOmKF6mXEFSHrduduc4yS.mp4",
       "likedBy": "luccho.ecom",
       "likedByAvatar": "curtiu1",
       "description": "Bem-vindo ao meu conteúdo privado 💎🔥"
@@ -113,7 +113,7 @@
     {
       "id": 2,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem2/1790197582098-tela-completa-copia-1-MflqzkZE70EN6o9nJ0vZVyd5Zz78sz.mp4",
+      "media": "https://r0haxgc1nbatgohz.private.blob.vercel-storage.com/panel-media/postagem2/1790202399842-tela-completa-copia-1-Br13eBUOc2Kd5a0vHvnRWiNcfF3NCe.mp4",
       "likedBy": "andresbarriles",
       "likedByAvatar": "curtiu2",
       "description": "Tem conteúdo novo esperando por você 👀"
@@ -121,7 +121,7 @@
     {
       "id": 3,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem3/1790197592910-tela-completa-copia-1--cover-FcVyTbTAWd4ditIoNNihRzkTW1Et8z.jpg",
+      "media": "https://r0haxgc1nbatgohz.private.blob.vercel-storage.com/panel-media/postagem3/1790202408362-tela-completa-copia-1--cover-mj0CXAH00E6cvFrFKTQsyDW5bWnw4y.jpg",
       "likedBy": "gabrieldamasceno",
       "likedByAvatar": "curtiu3",
       "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥"
@@ -155,7 +155,7 @@
       },
       {
         "enabled": true,
-        "src": "/api/media/panel-media/bump-2/1790197730775-bump-2-HoTiTy5jJS6ZYAAKgyHkWaMKc5hp2f.mp4",
+        "src": "https://r0haxgc1nbatgohz.private.blob.vercel-storage.com/panel-media/bump-2/1790202422315-encontre-dancinha-no-tiktok-pesquisa-do-tiktok-1-ufd0Z9ULptXG1tnI2whPyQ2mRoo623.mp4",
         "caption": "+50 vídeos especiais"
       }
     ]
