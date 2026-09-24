@@ -587,7 +587,7 @@ export default function HomePage(){
           })}</div>
           <div className="sectionTitle">{config.labels.subscriptions}</div>
           <div className="subscriptionButtons">{subscriptions.map(plan=><button key={plan.id} className="subscribeButton" type="button" onClick={()=>openOffer(plan)}><span>{plan.name}</span><strong>{money(plan.price)}</strong></button>)}</div>
-          <WaveAudioPlayer src={config.audio.src} ariaLabel={config.audio.ariaLabel} thumb={config.audio.thumb || config.media?.profile || '/profile.jpg'}/>
+          <WaveAudioPlayer src={config.audio.src} ariaLabel={config.audio.ariaLabel} thumb={config.audio.thumb || '/audio-play.png'}/>
         </div>
       </section>
 
