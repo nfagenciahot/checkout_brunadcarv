@@ -116,7 +116,7 @@ function WaveBars({ bars }) {
   return <div className="waveBars">{bars.map((height, i) => <span key={i} className="waveBar" style={{height:`${height}px`}} />)}</div>;
 }
 
-function WaveAudioPlayer({ src, ariaLabel }) {
+function WaveAudioPlayer({ src, ariaLabel, thumb }) {
   const audioRef = useRef(null);
   const waveRef = useRef(null);
   const rafRef = useRef(null);
@@ -191,7 +191,7 @@ function WaveAudioPlayer({ src, ariaLabel }) {
   return <div className="welcomeAudio" aria-label={ariaLabel}>
     <audio ref={audioRef} src={src} preload="metadata" onLoadedMetadata={e=>setDuration(e.currentTarget.duration)} onPlay={()=>{setStarted(true);setPlaying(true)}} onPause={()=>setPlaying(false)} onEnded={()=>{setPlaying(false);setProgress(1)}} onTimeUpdate={e=>{ if(!playing) setProgress(e.currentTarget.duration ? e.currentTarget.currentTime/e.currentTarget.duration : 0); }} />
     <button type="button" className="audioPlayButton" onClick={togglePlay} aria-label={playing?'Pausar áudio':'Reproduzir áudio'}>
-      {!playing ? <span className="audioPlayGlyph"><IconPlay/></span> : <span className="audioPause"><i/><i/></span>}
+      {!playing ? <img src={thumb} alt="" className="audioThumbImg"/> : <span className="audioPause"><i/><i/></span>}
     </button>
     <div className={`waveTrack ${started?'started':'waiting'}`} ref={waveRef} onClick={seek} role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress*100)}>
       <div className="waveBase"><WaveBars bars={bars}/></div>
@@ -587,7 +587,7 @@ export default function HomePage(){
           })}</div>
           <div className="sectionTitle">{config.labels.subscriptions}</div>
           <div className="subscriptionButtons">{subscriptions.map(plan=><button key={plan.id} className="subscribeButton" type="button" onClick={()=>openOffer(plan)}><span>{plan.name}</span><strong>{money(plan.price)}</strong></button>)}</div>
-          <WaveAudioPlayer src={config.audio.src} ariaLabel={config.audio.ariaLabel}/>
+          <WaveAudioPlayer src={config.audio.src} ariaLabel={config.audio.ariaLabel} thumb={config.audio.thumb || config.media?.profile || '/profile.jpg'}/>
         </div>
       </section>
 
