@@ -105,16 +105,16 @@
     {
       "id": 1,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem1/1790216765586-tela-completa-1-jptMlJMYdqwXnYsjqNZVzAaH3WLU5b.mp4",
-      "likedBy": "luccho.ecom",
+      "media": "/api/media/panel-media/postagem1/1790217706210-gg-5k4DJAuluQbtH8DorXVFxin5IeIi2Z.mp4",
+      "likedBy": "mathfarias5",
       "likedByAvatar": "curtiu1",
-      "description": "Bem-vindo ao meu conteúdo privado 💎🔥"
+      "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥"
     },
     {
       "id": 2,
       "enabled": true,
-      "media": "/api/media/panel-media/postagem2/1790202399842-tela-completa-copia-1-Br13eBUOc2Kd5a0vHvnRWiNcfF3NCe.mp4",
-      "likedBy": "andresbarriles",
+      "media": "/api/media/panel-media/postagem2/1790217714059-tela-completa-copia-2-DSPXUaogpRHldwtH4vE65Oi1xqt0IC.mp4",
+      "likedBy": "andrerugal",
       "likedByAvatar": "curtiu2",
       "description": "Tem conteúdo novo esperando por você 👀"
     },
@@ -122,16 +122,16 @@
       "id": 3,
       "enabled": false,
       "media": "/api/media/panel-media/postagem3/1790202408362-tela-completa-copia-1--cover-mj0CXAH00E6cvFrFKTQsyDW5bWnw4y.jpg",
-      "likedBy": "gabrieldamasceno",
+      "likedBy": "pauloprive",
       "likedByAvatar": "curtiu3",
       "description": "Se gostou dessa prévia, imagina o que tem no VIP 🔥"
     }
   ],
   "lockedPost": {
     "title": "",
-    "likedBy": "luccho.ecom",
+    "likedBy": "pedro.llz",
     "description": "Assine o VIP para liberar todas as fotos e vídeos privados.",
-    "likedByAvatar": "curtiu1",
+    "likedByAvatar": "curtiu2",
     "enabled": true
   },
   "orderBump": {
@@ -140,7 +140,7 @@
     "title": "Tenho mais uma surpresinha esperando por você 🔥",
     "lead": "Além do VIP você pode ter acesso a mais conteúdos especiais 💦",
     "benefits": [
-      "♡ 1 Foto com seu nome na minha bunda",
+      "♡ 1 Foto personalizada com o seu nome",
       "♡ 50 Vídeos safados com minhas amigas",
       "♡ Acesso ao meu WhatsApp privado",
       "♡ Grupo privado dos melhores conteúdos"
@@ -149,12 +149,12 @@
     "skipButton": "🚫 Somente o VIP",
     "media": [
       {
-        "enabled": false,
-        "src": "/api/media/panel-media/bump-1/1790197728851-bump-1-8e7o3VbOwGilbetwMurJ6DJhrU9cse.jpg",
-        "caption": "1 Foto personalizada"
+        "enabled": true,
+        "src": "/api/media/panel-media/bump-1/1790217528243-video4-ZQ0yGFSlKuI730ksYQZjvFs7LOg0cQ.mp4",
+        "caption": "+50 vídeos especiais"
       },
       {
-        "enabled": true,
+        "enabled": false,
         "src": "/api/media/panel-media/bump-2/1790202422315-encontre-dancinha-no-tiktok-pesquisa-do-tiktok-1-ufd0Z9ULptXG1tnI2whPyQ2mRoo623.mp4",
         "caption": "+50 vídeos especiais"
       }
@@ -181,9 +181,9 @@
     "pixTimeoutMinutes": 20
   },
   "likedByAvatars": {
-    "curtiu1": "/api/media/panel-media/curtiu1/1790197722827-curtiu1-lwgQdxqNeHra37K6ROvdI9XigvlLCu.jpg",
-    "curtiu2": "/api/media/panel-media/curtiu2/1790197726441-curtiu2-jozubmgGRE9YJ0Ud0Eyy7yGJBdhz9s.jpg",
-    "curtiu3": "/api/media/panel-media/curtiu3/1790197727832-curtiu3-xtnKvCXGJSQnT8N9VtJqmibSAUbace.jpg"
+    "curtiu1": "/api/media/panel-media/curtiu1/1790217365406-1-A09pFZx2yF1aMxwlkI4NCSVVzvFpwZ.png",
+    "curtiu2": "/api/media/panel-media/curtiu2/1790217367856-2-AAdkuBDECVnau1t0TSCFJcN5U4yUq8.png",
+    "curtiu3": "/api/media/panel-media/curtiu3/1790217370729-3-ardszKj8tI6K1uQma9lBA8Xxp2K5Yk.png"
   },
   "interaction": {
     "clickLockMs": 300
