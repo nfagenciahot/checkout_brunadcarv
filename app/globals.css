@@ -90,7 +90,7 @@ button,.panelUploadButton,.subscribeButton,.modalGradientButton,.panelPrimary,.p
 .coverViewport{height:420px!important;transition:none!important}
 .coverImage{transition:none!important;transform:none!important}
 .verifiedImg{display:block;fill:none}
-.audioThumbImg{width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;box-shadow:0 6px 20px rgba(0,0,0,.22)}
+.audioThumbImg{width:72px;height:72px;display:block;object-fit:contain}
 .smartVideoShell{position:relative;width:100%;overflow:hidden;background:#111;line-height:0}.smartVideoShell:not(.started){cursor:pointer}
 .smartVideoShell video{transition:opacity .12s ease;background:#111}
 .smartVideoShell:not(.frameReady):not(.started) video{opacity:0}
