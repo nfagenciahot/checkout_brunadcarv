@@ -242,8 +242,12 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
   },[src]);
 
   useEffect(()=>{
+    if(!nearViewport) return;
     const video=videoRef.current;
-    if(video && nearViewport) video.preload='auto';
+    if(video) video.preload='auto';
+    // iOS Safari não carrega metadados antes de interação — força frameReady após 2.5s
+    const t=setTimeout(()=>{ if(!frameReadyRef.current){ frameReadyRef.current=true; setFrameReady(true); } },2500);
+    return()=>clearTimeout(t);
   },[nearViewport]);
 
   function markFrameReady(video){
