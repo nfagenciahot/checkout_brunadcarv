@@ -120,7 +120,7 @@
     },
     {
       "id": 3,
-      "enabled": true,
+      "enabled": false,
       "media": "/api/media/panel-media/postagem3/1790202408362-tela-completa-copia-1--cover-mj0CXAH00E6cvFrFKTQsyDW5bWnw4y.jpg",
       "likedBy": "gabrieldamasceno",
       "likedByAvatar": "curtiu3",
