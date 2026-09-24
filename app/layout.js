@@ -6,6 +6,8 @@ const nunito = Nunito_Sans({
   weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-bio',
+  preload: false,
+  fallback: ['Arial', 'sans-serif'],
 });
 
 export const metadata = {
