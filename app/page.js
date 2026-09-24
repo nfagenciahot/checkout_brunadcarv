@@ -213,16 +213,16 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
   const frameReadyRef=useRef(false);
   const [duration,setDuration]=useState(null);
   const [nearViewport,setNearViewport]=useState(false);
-  const [frameReady,setFrameReady]=useState(false);
+  const [frameReady,setFrameReady]=useState(true);
   const [started,setStarted]=useState(false);
   const [loading,setLoading]=useState(false);
   const [mediaError,setMediaError]=useState(false);
 
   useEffect(()=>{
     primedRef.current=false;
-    frameReadyRef.current=false;
+    frameReadyRef.current=true;
     setDuration(null);
-    setFrameReady(false);
+    setFrameReady(true);
     setStarted(false);
     setLoading(false);
     setMediaError(false);
