@@ -210,6 +210,7 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
   const videoRef=useRef(null);
   const shellRef=useRef(null);
   const primedRef=useRef(false);
+  const frameReadyRef=useRef(false);
   const [duration,setDuration]=useState(null);
   const [nearViewport,setNearViewport]=useState(false);
   const [frameReady,setFrameReady]=useState(false);
@@ -219,6 +220,7 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
 
   useEffect(()=>{
     primedRef.current=false;
+    frameReadyRef.current=false;
     setDuration(null);
     setFrameReady(false);
     setStarted(false);
@@ -245,12 +247,14 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
   },[nearViewport]);
 
   function markFrameReady(video){
+    if(frameReadyRef.current) return;
     if(typeof video.requestVideoFrameCallback==='function'){
       let done=false;
-      const finish=()=>{if(!done){done=true;setFrameReady(true);}};
+      const finish=()=>{if(!done){done=true;frameReadyRef.current=true;setFrameReady(true);}};
       video.requestVideoFrameCallback(finish);
       setTimeout(finish,600);
     } else {
+      frameReadyRef.current=true;
       setFrameReady(true);
     }
   }
@@ -263,6 +267,8 @@ function SmartVideo({ src, className='', onActivate=null, showDuration=false, ar
     const target=previewFrameTime(video.duration);
     if(target>0.02){
       try{ video.currentTime=target; }catch(_){ markFrameReady(video); }
+      // Fallback: onSeeked frequentemente não dispara no mobile (iOS Safari)
+      setTimeout(()=>{ if(!frameReadyRef.current) markFrameReady(video); },1500);
     } else {
       markFrameReady(video);
     }
